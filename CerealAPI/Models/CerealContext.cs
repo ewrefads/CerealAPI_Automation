@@ -1,0 +1,518 @@
+﻿using Csv;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
+using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.FileIO;
+using MySql.Data.MySqlClient;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
+namespace CerealAPI.Models
+{
+    internal class CerealContext
+    {
+        public string ConnectionString { get; set; }
+        public CerealContext(string connectionString)
+        {
+            ConnectionString = connectionString;
+        }
+
+        public MySqlConnection GetConnection()
+        {
+            return new MySqlConnection(ConnectionString);
+        }
+
+        public List<Cereal> GetAllCereals()
+        {
+            List<Cereal> list = new List<Cereal>();
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM cereal", conn);
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new Cereal()
+                        { 
+                            Id = reader.GetInt32("id"),
+                            Name = reader.GetString("cereal_name"),
+                            MFR =  reader.GetChar("mfr"),
+                            Type = reader.GetChar("cereal_type"),
+                            Calories = reader.GetInt32("calories"),
+                            Protein = reader.GetInt32("protein"),
+                            Fat = reader.GetInt32("fat"),
+                            Sodium = reader.GetInt32("sodium"),
+                            Fiber = reader.GetFloat("fiber"),
+                            Carbo = reader.GetFloat("carbo"),
+                            Sugars = reader.GetInt32("sugars"),
+                            Potass = reader.GetInt32("potass"),
+                            Vitamins = reader.GetInt32("vitamins"),
+                            Shelf = reader.GetInt32("shelf"),
+                            Weight = reader.GetFloat("weight"),
+                            Cups = reader.GetFloat("cups"),
+                            Rating = reader.GetString("rating")
+                        });
+                    }
+                }
+            }
+            return list;
+        }
+
+        public bool DeleteCereal(int id)
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                MySqlCommand deleteCommand = new MySqlCommand($"DELETE FROM cereal WHERE id = {id}", conn);
+                int amount = deleteCommand.ExecuteNonQuery();
+                conn.Close();
+                if (amount > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public bool ContainsId(int id)
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand($"SELECT id from cereal WHERE id = {id}", conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                bool contains = reader.HasRows;
+                reader.Close();
+                return contains;
+            }
+        }
+        public List<Cereal> GetFilteredCereals(string? name, string? mfr, string? type, int? calories, int? protein, int? fat, int? sodium, float? fiber, float? carbo, int? sugars, int? potass, int? vitamins, int? shelf, float? weight, float? cups, string? rating)
+        {
+            List<Cereal> filteredList = new List<Cereal>();
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                string filter = "";
+                if(name != null)
+                {
+                    filter = AddStringFilter(filter, "cereal_name", name);
+                }
+                if(mfr != null)
+                {
+                    if(mfr.Length > 1)
+                    {
+                        switch(mfr.ToLower())
+                        {
+                            case "american home food products":
+                            case "ahfd":
+                                mfr = "A";
+                                break;
+                            case "general mills":
+                            case "gm":
+                                mfr = "G";
+                                break;
+                            case "kellogs":
+                                mfr = "K";
+                                break;
+                            case "nabisco":
+                                mfr = "N";
+                                break;
+                            case "post":
+                                mfr = "P";
+                                break;
+                            case "quaker oats":
+                            case "qo":
+                                mfr = "Q";
+                                break;
+                            case "raiston purina":
+                            case "rp":
+                                mfr = "R";
+                                break;
+                        }
+                    }
+                    filter = AddStringFilter(filter, "mfr", mfr);
+                }
+                if(type != null)
+                {
+                    if (type.Length > 1)
+                    {
+                        if (type.ToLower() == "cold")
+                        {
+                            type = "C";
+                        }
+                        else if (type.ToLower() == "hot")
+                        {
+                            type = "H";
+                        }
+                    }
+                    filter = AddStringFilter(filter, "cereal_type", type);
+                }
+                if(calories != null)
+                {
+                    filter = AddIntFilter(filter, "calories", (int)calories);
+                }
+                if (protein != null)
+                {
+                    filter = AddIntFilter(filter, "protein", (int)protein);
+                }
+                if (fat != null)
+                {
+                    filter = AddIntFilter(filter, "fat", (int)fat);
+                }
+                if (sodium != null)
+                {
+                    filter = AddIntFilter(filter, "sodium", (int)sodium);
+                }
+                if (fiber != null)
+                {
+                    filter = AddFloatFilter(filter, "fiber", (float)fiber);
+                }
+                if (carbo != null)
+                {
+                    filter = AddFloatFilter(filter, "carbo", (float)carbo);
+                }
+                if (sugars != null)
+                {
+                    filter = AddIntFilter(filter, "sugars", (int)sugars);
+                }
+                if (potass != null)
+                {
+                    filter = AddIntFilter(filter, "potass", (int)potass);
+                }
+                if (vitamins != null)
+                {
+                    filter = AddIntFilter(filter, "vitamins", (int)vitamins);
+                }
+                if (shelf != null)
+                {
+                    filter = AddIntFilter(filter, "shelf", (int)shelf);
+                }
+                if (weight != null)
+                {
+                    filter = AddFloatFilter(filter, "weight", (float)weight);
+                }
+                if (cups != null)
+                {
+                    filter = AddFloatFilter(filter, "cups", (float)cups);
+                }
+                if(rating != null)
+                {
+                    filter = AddStringFilter(filter, "rating", rating);
+                }
+                MySqlCommand cmd = new MySqlCommand($"SELECT * FROM cereal WHERE {filter}", conn);
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        filteredList.Add(new Cereal()
+                        {
+                            Id = reader.GetInt32("id"),
+                            Name = reader.GetString("cereal_name"),
+                            MFR = reader.GetChar("mfr"),
+                            Type = reader.GetChar("cereal_type"),
+                            Calories = reader.GetInt32("calories"),
+                            Protein = reader.GetInt32("protein"),
+                            Fat = reader.GetInt32("fat"),
+                            Sodium = reader.GetInt32("sodium"),
+                            Fiber = reader.GetFloat("fiber"),
+                            Carbo = reader.GetFloat("carbo"),
+                            Sugars = reader.GetInt32("sugars"),
+                            Potass = reader.GetInt32("potass"),
+                            Vitamins = reader.GetInt32("vitamins"),
+                            Shelf = reader.GetInt32("shelf"),
+                            Weight = reader.GetFloat("weight"),
+                            Cups = reader.GetFloat("cups"),
+                            Rating = reader.GetString("rating")
+                        });
+                    }
+                }
+            }
+            return filteredList;
+        }
+
+        private string AddIntFilter(string filter, string collumn, int value)
+        {
+            if(filter.Length > 0)
+            {
+                filter += " AND";
+            }
+            return filter += $" {collumn} = {value}";
+        }
+        private string AddFloatFilter(string filter, string collumn, float value)
+        {
+            if (filter.Length > 0)
+            {
+                filter += " AND";
+            }
+            return filter += $" {collumn} = {value}";
+        }
+        private string AddStringFilter(string filter, string collumn, string value)
+        {
+            if (filter.Length > 0)
+            {
+                filter += " AND";
+            }
+            return filter += $" {collumn} = \"{value}\"";
+        }
+        public void AddCereal(Cereal cereal)
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                MySqlCommand dbCmd = new MySqlCommand("USE cerealdb", conn);
+                dbCmd.ExecuteNonQuery();
+                MySqlCommand cmd = new MySqlCommand($"SELECT id FROM cereal ORDER BY id DESC LIMIT 1", conn);
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    int id = 0;
+                    if(reader.HasRows)
+                    {
+                        while(reader.Read())
+                        {
+                            id = reader.GetInt32("Id") + 1;
+                        }
+                    }
+                    reader.Close();
+                    MySqlCommand insertCmd = new MySqlCommand($"INSERT INTO cereal VALUES({id}, '{cereal.Name}', '{cereal.MFR.ToString()}', '{cereal.Type.ToString()}', {cereal.Calories}, {cereal.Protein}, {cereal.Fat}, {cereal.Sodium}, {cereal.Fiber}, {cereal.Carbo}, {cereal.Sugars}, {cereal.Potass}, {cereal.Vitamins}, {cereal.Shelf}, {cereal.Weight}, {cereal.Cups}, \"{cereal.Rating}\")", conn);
+                    insertCmd.ExecuteNonQuery();
+                }
+            }
+        }
+        public Cereal UpdateCereal(Cereal cereal)
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                Cereal c = GetCereal(cereal.Id);
+                string updateValues = "";
+                if(cereal.Name != c.Name && cereal.Name.Length != 0)
+                {
+                    updateValues += $" cereal_name = \"{cereal.Name}\"";
+                }
+                if(cereal.MFR != c.MFR && cereal.MFR != '0')
+                {
+                    if(updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $" mfr = \"{cereal.MFR}\"";
+                }
+                if (cereal.Type != c.Type && cereal.Type != 'N')
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $" cereal_type = \"{cereal.Type}\"";
+                }
+                if (cereal.Calories != c.Calories && cereal.Calories != -1)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $" calories = {cereal.Calories}";
+                }
+                if (cereal.Protein != c.Protein && cereal.Protein != -1)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $" protein = {cereal.Protein}";
+                }
+                if (cereal.Fat != c.Fat && cereal.Fat != -1)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $" fat = {cereal.Fat}";
+                }
+                if (cereal.Sodium != c.Sodium && cereal.Sodium != -1)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $" sodium = {cereal.Sodium}";
+                }
+                if (cereal.Fiber != c.Fiber && cereal.Fiber != -1)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $" fiber = {cereal.Fiber}";
+                }
+                if (cereal.Carbo != c.Carbo && cereal.Carbo != -1)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $" carbo = {cereal.Carbo}";
+                }
+                if (cereal.Sugars != c.Sugars && cereal.Sugars != -1)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $" sugars = {cereal.Sugars}";
+                }
+                if (cereal.Potass != c.Potass && cereal.Potass != -1)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $" potass = {cereal.Potass}";
+                }
+                if (cereal.Vitamins != c.Vitamins && cereal.Vitamins != -1)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $" vitamins = {cereal.Vitamins}";
+                }
+                if (cereal.Shelf != c.Shelf && cereal.Shelf != -1)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $" shelf = {cereal.Shelf}";
+                }
+                if (cereal.Weight != c.Weight && cereal.Weight != -1)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $"weight = {cereal.Weight}";
+                }
+                if (cereal.Cups != c.Cups && cereal.Cups != -1)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $"cups = {cereal.Cups}";
+                }
+                if (cereal.Rating != c.Rating && cereal.Rating.Length != 0)
+                {
+                    if (updateValues.Length > 0)
+                    {
+                        updateValues += ",";
+                    }
+                    updateValues += $"rating = \"{cereal.Rating}\"";
+                }
+                if (updateValues.Length > 0)
+                {
+                    MySqlCommand updateCommand = new MySqlCommand($"UPDATE cereal SET {updateValues} WHERE id = {cereal.Id}", conn);
+                    updateCommand.ExecuteNonQuery();
+                }
+                return GetCereal(cereal.Id);
+            }
+        }
+        public Cereal GetCereal(int id)
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                MySqlCommand selectCommand = new MySqlCommand($"SELECT * FROM cereal WHERE id = {id}", conn);
+                MySqlDataReader selectReader = selectCommand.ExecuteReader();
+                if (selectReader.HasRows)
+                {
+                    Cereal cereal = new Cereal();
+                    while (selectReader.Read())
+                    {
+                        cereal = new Cereal()
+                        {
+                            Id = selectReader.GetInt32("id"),
+                            Name = selectReader.GetString("cereal_name"),
+                            MFR = selectReader.GetChar("mfr"),
+                            Type = selectReader.GetChar("cereal_type"),
+                            Calories = selectReader.GetInt32("calories"),
+                            Protein = selectReader.GetInt32("protein"),
+                            Fat = selectReader.GetInt32("fat"),
+                            Sodium = selectReader.GetInt32("sodium"),
+                            Fiber = selectReader.GetFloat("fiber"),
+                            Carbo = selectReader.GetFloat("carbo"),
+                            Sugars = selectReader.GetInt32("sugars"),
+                            Potass = selectReader.GetInt32("potass"),
+                            Vitamins = selectReader.GetInt32("vitamins"),
+                            Shelf = selectReader.GetInt32("shelf"),
+                            Weight = selectReader.GetFloat("weight"),
+                            Cups = selectReader.GetFloat("cups"),
+                            Rating = selectReader.GetString("rating")
+                        };
+                    }
+                    
+                    selectReader.Close();
+                    return cereal;
+                }
+                else
+                {
+                    return new Cereal();
+                }
+            }
+        }
+
+        public int GetId(string name, char mfr)
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand($"SELECT id FROM cereal WHERE cereal_name = \"{name}\" AND mfr = \"{mfr}\"", conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                int id = -1;
+                while(reader.HasRows && reader.Read())
+                {
+                    id = (int)reader.GetInt32("id");
+                }
+                return id;
+            }
+        }
+        public void CreateDB()
+        {
+            using (MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;user=root;password=test"))
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand(
+                    "CREATE DATABASE IF NOT EXISTS cerealdb;\r\n" +
+                    "USE cerealdb;\r\n" +
+                    "CREATE TABLE IF NOT EXISTS cereal (\r\n\t" +
+                        "id INT UNIQUE,\r\n    " +
+                        "cereal_name VARCHAR(255),\r\n    " +
+                        "mfr CHAR(1),\r\n    " +
+                        "cereal_type CHAR(1),\r\n    " +
+                        "calories INT,\r\n    " +
+                        "protein INT,\r\n    " +
+                        "fat INT,\r\n    " +
+                        "sodium INT,\r\n    " +
+                        "fiber FLOAT,\r\n    " +
+                        "carbo FLOAT,\r\n    " +
+                        "sugars INT,\r\n    " +
+                        "potass INT,\r\n    " +
+                        "vitamins INT,\r\n    " +
+                        "shelf INT,\r\n    " +
+                        "weight FLOAT,\r\n    " +
+                        "cups FLOAT,\r\n    " +
+                        "rating VARCHAR(255),\r\n    " +
+                        "UNIQUE KEY unique_name_mfr(cereal_name, mfr)\r\n" +
+                    ");", conn);
+                cmd.ExecuteNonQuery();
+                MySqlCommand contentCheck = new MySqlCommand("SELECT * FROM cereal", conn);
+                int rowNumber = contentCheck.ExecuteNonQuery();
+                conn.Close();
+                Console.WriteLine("loading data");
+                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Cereal.csv");
+            }
+        }
+    }
+}
