@@ -1,7 +1,9 @@
 ﻿using CerealAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
+using System;
 using System.Buffers.Text;
+using System.Net;
+using System.Xml.Linq;
 
 namespace CerealAPI.Controllers
 {
@@ -34,12 +36,15 @@ namespace CerealAPI.Controllers
         {
             if (id != null)
             {
+                cerealContext.LogAPICall(DateTime.Now.ToString(), "GetCereal", $"{id}, {name}, {manufacturer}, {type}, {calories}, {protein}, {fat}, {sodium}, {fiber}, {carbo}, {sugars}, {potass}, {vitamins}, {shelf}, {weight}, {cups}, {rating}", "200:Ok");
                 return Ok(new List<Cereal> { cerealContext.GetCereal((int)id) });
             }
             if (name != null || manufacturer != null || type != null || calories != null || protein != null || fat != null || sodium != null || fiber != null || carbo != null || sugars != null || potass != null || vitamins != null || shelf != null || weight != null || cups != null || rating != null)
             {
+                cerealContext.LogAPICall(DateTime.Now.ToString(), "GetCereal", $"{id}, {name}, {manufacturer}, {type}, {calories}, {protein}, {fat}, {sodium}, {fiber}, {carbo}, {sugars}, {potass}, {vitamins}, {shelf}, {weight}, {cups}, {rating}", "200:Ok");
                 return Ok(cerealContext.GetFilteredCereals(name, manufacturer, type, calories, protein, fat, sodium, fiber, carbo, sugars, potass, vitamins, shelf, weight, cups, rating, sort));
             }
+            cerealContext.LogAPICall(DateTime.Now.ToString(), "GetCereal", $"{id}, {name}, {manufacturer}, {type}, {calories}, {protein}, {fat}, {sodium}, {fiber}, {carbo}, {sugars}, {potass}, {vitamins}, {shelf}, {weight}, {cups}, {rating}", "200:Ok");
             return Ok(cerealContext.GetAllCereals(sort));
         }
 
@@ -58,15 +63,18 @@ namespace CerealAPI.Controllers
                 bool deleted = cerealContext.DeleteCereal(id);
                 if (deleted)
                 {
+                    cerealContext.LogAPICall(DateTime.Now.ToString(), "DeleteCereal", $"{id}", "200:Ok");
                     return Ok("Deleted the requested cereal");
                 }
                 else
                 {
+                    cerealContext.LogAPICall(DateTime.Now.ToString(), "DeleteCereal", $"{id}", "200:Ok");
                     return Ok($"No cereal with id {id} was found");
                 }
             }
             else
             {
+                cerealContext.LogAPICall(DateTime.Now.ToString(), "DeleteCereal", $"{id}", "400:Bad Request");
                 return BadRequest("invalid username or password");
             }
         }
@@ -158,13 +166,19 @@ namespace CerealAPI.Controllers
                     {
                         cereal.Id = (int)id;
                         cereal = cerealContext.UpdateCereal(cereal);
+                        cerealContext.LogAPICall(DateTime.Now.ToString(), "AddCereal", $"{id}, {name}, {manufacturer}, {type}, {calories}, {protein}, {fat}, {sodium}, {fiber}, {carbo}, {sugars}, {potass}, {vitamins}, {shelf}, {weight}, {cups}, {rating}", "200:Ok");
                         return Ok(cereal);
                     }
                     else
                     {
                         if (name.ToLower() == "teapot")
                         {
+                            cerealContext.LogAPICall(DateTime.Now.ToString(), "AddCereal", $"{id}, {name}, {manufacturer}, {type}, {calories}, {protein}, {fat}, {sodium}, {fiber}, {carbo}, {sugars}, {potass}, {vitamins}, {shelf}, {weight}, {cups}, {rating}", "418:Im a teapot");
                             return BadRequest(StatusCodes.Status418ImATeapot + ": i'm a teapot which doesn't exists. id must be null or an existing value");
+                        }
+                        else
+                        {
+                            cerealContext.LogAPICall(DateTime.Now.ToString(), "AddCereal", $"{id}, {name}, {manufacturer}, {type}, {calories}, {protein}, {fat}, {sodium}, {fiber}, {carbo}, {sugars}, {potass}, {vitamins}, {shelf}, {weight}, {cups}, {rating}", "404:Not Found");
                         }
                         return NotFound("id must be null or an existing value");
                     }
@@ -173,33 +187,39 @@ namespace CerealAPI.Controllers
                 {
 
                     cerealContext.AddCereal(cereal);
+                    cerealContext.LogAPICall(DateTime.Now.ToString(), "AddCereal", $"{id}, {name}, {manufacturer}, {type}, {calories}, {protein}, {fat}, {sodium}, {fiber}, {carbo}, {sugars}, {potass}, {vitamins}, {shelf}, {weight}, {cups}, {rating}", "200:Ok");
                     return Ok(cereal);
                 }
             }
             else
             {
+                cerealContext.LogAPICall(DateTime.Now.ToString(), "AddCereal", $"{id}, {name}, {manufacturer}, {type}, {calories}, {protein}, {fat}, {sodium}, {fiber}, {carbo}, {sugars}, {potass}, {vitamins}, {shelf}, {weight}, {cups}, {rating}", "400:Bad Request");
                 return BadRequest("invalid username or password");
             }
             
         }
 
-        [HttpPut(Name = "AddOrUpdateCereal")]
-        public IActionResult AddOrUpdateCereal(string username, string password, string name, string manufacturer, string? type, int? calories, int? protein, int? fat, int? sodium, float? fiber, float? carbo, int? sugars, int? potass, int? vitamins, int? shelf, float? weight, float? cups, string? rating)
+        [HttpPut(Name = "UpdateCereal")]
+        public IActionResult UpdateCereal(string username, string password, string name, string manufacturer, string? type, int? calories, int? protein, int? fat, int? sodium, float? fiber, float? carbo, int? sugars, int? potass, int? vitamins, int? shelf, float? weight, float? cups, string? rating)
         {
             int id = cerealContext.GetId(name, manufacturer[0]);
             bool validUser = Login(username, password);
             if(id == -1 && validUser)
             {
+                cerealContext.LogAPICall(DateTime.Now.ToString(), "UpdateCereal", $"{id}, {name}, {manufacturer}, {type}, {calories}, {protein}, {fat}, {sodium}, {fiber}, {carbo}, {sugars}, {potass}, {vitamins}, {shelf}, {weight}, {cups}, {rating}", "404:Not Found");
                 return NotFound("No cereal with the given id was found");
             }
             else if(validUser)
             {
+                cerealContext.LogAPICall(DateTime.Now.ToString(), "UpdateCereal", $"{id}, {name}, {manufacturer}, {type}, {calories}, {protein}, {fat}, {sodium}, {fiber}, {carbo}, {sugars}, {potass}, {vitamins}, {shelf}, {weight}, {cups}, {rating}", "200:Ok");
                 return (AddCereal(username, password, id, name, manufacturer, type, calories, protein, fat, sodium, fiber, carbo, sugars, potass, vitamins, shelf, weight, cups, rating));
             }
             else
             {
+                cerealContext.LogAPICall(DateTime.Now.ToString(), "UpdateCereal", $"{id}, {name}, {manufacturer}, {type}, {calories}, {protein}, {fat}, {sodium}, {fiber}, {carbo}, {sugars}, {potass}, {vitamins}, {shelf}, {weight}, {cups}, {rating}", "400:Bad Request");
                 return BadRequest("Invalid username or password");
             }
         }
+
     }
 }

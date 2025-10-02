@@ -161,9 +161,12 @@ namespace ServerConfiguration
                     "CREATE TABLE IF NOT EXISTS users (\r\n\t" +
                         "username VARCHAR(255) UNIQUE NOT NULL,\r\n    " +
                         "psswrd VARCHAR(255) NOT NULL\r\n);\r\n\r\n" +
-                    "CREATE TABLE IF NOT EXISTS api_keys(\r\n\t" +
-                        "api_key VARCHAR(255) UNIQUE NOT NULL,\r\n    " +
-                        "valid_until FLOAT NOT NULL\r\n)"
+                    "CREATE TABLE IF NOT EXISTS api_log (\r\n\t" +
+                        "acces_time VARCHAR(255),\r\n    " +
+                        "command VARCHAR(255),\r\n    " +
+                        "arguments VARCHAR(255),\r\n    " +
+                        "result VARCHAR(255)\r\n" +
+                    ")"
                     , conn);
                 cmd.ExecuteNonQuery();
                 cmd = new MySqlCommand("SELECT * FROM users", conn);
@@ -179,9 +182,11 @@ namespace ServerConfiguration
                 }
                 
                 MySqlCommand contentCheck = new MySqlCommand("SELECT * FROM cereal", conn);
-                int rowNumber = contentCheck.ExecuteNonQuery();
+                MySqlDataReader contentReader = contentCheck.ExecuteReader();
+
+                bool hasRows = contentReader.HasRows;
                 conn.Close();
-                if(rowNumber == 0)
+                if (!hasRows)
                 {
                     Console.WriteLine("loading data");
                     string path = Path.Combine(@"Cereal.csv");

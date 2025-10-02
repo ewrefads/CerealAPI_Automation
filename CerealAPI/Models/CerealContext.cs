@@ -9,12 +9,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Xml;
 namespace CerealAPI.Models
 {
-    internal class CerealContext
+    public class CerealContext
     {
         public string ConnectionString { get; set; }
+        public string DatabaseName { get; set; }
         public CerealContext(string connectionString)
         {
             ConnectionString = connectionString;
@@ -22,6 +24,11 @@ namespace CerealAPI.Models
 
         public MySqlConnection GetConnection()
         {
+            if(DatabaseName != null && DatabaseName != "")
+            {
+                ConnectionString = $"server=localhost;port=3306;database={DatabaseName};user=root;password=test";
+                DatabaseName = "";
+            }
             return new MySqlConnection(ConnectionString);
         }
 
@@ -308,7 +315,7 @@ namespace CerealAPI.Models
                         }
                     }
                     reader.Close();
-                    MySqlCommand insertCmd = new MySqlCommand($"INSERT INTO cereal VALUES({id}, '{cereal.Name}', '{cereal.MFR.ToString()}', '{cereal.Type.ToString()}', {cereal.Calories}, {cereal.Protein}, {cereal.Fat}, {cereal.Sodium}, {cereal.Fiber}, {cereal.Carbo}, {cereal.Sugars}, {cereal.Potass}, {cereal.Vitamins}, {cereal.Shelf}, {cereal.Weight}, {cereal.Cups}, \"{cereal.Rating}\")", conn);
+                    MySqlCommand insertCmd = new MySqlCommand($"INSERT INTO cereal VALUES({id}, \"{cereal.Name}\", \"{cereal.MFR.ToString()}\", \"{cereal.Type.ToString()}\", {cereal.Calories}, {cereal.Protein}, {cereal.Fat}, {cereal.Sodium}, {cereal.Fiber}, {cereal.Carbo}, {cereal.Sugars}, {cereal.Potass}, {cereal.Vitamins}, {cereal.Shelf}, {cereal.Weight}, {cereal.Cups}, \"{cereal.Rating}\")", conn);
                     insertCmd.ExecuteNonQuery();
                 }
             }
@@ -511,14 +518,19 @@ namespace CerealAPI.Models
                 return id;
             }
         }
-        public void CreateDB()
+        public void CreateDB(IWebHostEnvironment env)
         {
             using (MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;user=root;password=test"))
             {
                 conn.Open();
+                string db = "cerealdb";
+                if(DatabaseName != null)
+                {
+                    db = DatabaseName;
+                }
                 MySqlCommand cmd = new MySqlCommand(
-                    "CREATE DATABASE IF NOT EXISTS cerealdb;\r\n" +
-                    "USE cerealdb;\r\n" +
+                    $"CREATE DATABASE IF NOT EXISTS {db};\r\n" +
+                    $"USE {db};\r\n" +
                     "CREATE TABLE IF NOT EXISTS cereal (\r\n\t" +
                         "id INT UNIQUE,\r\n    " +
                         "cereal_name VARCHAR(255),\r\n    " +
@@ -538,13 +550,106 @@ namespace CerealAPI.Models
                         "cups FLOAT,\r\n    " +
                         "rating VARCHAR(255),\r\n    " +
                         "UNIQUE KEY unique_name_mfr(cereal_name, mfr)\r\n" +
-                    ");", conn);
+                    ");" +
+                    "CREATE TABLE IF NOT EXISTS users (\r\n\t" +
+                        "username VARCHAR(255) UNIQUE NOT NULL,\r\n    " +
+                        "psswrd VARCHAR(255) NOT NULL\r\n);\r\n\r\n" +
+                    "CREATE TABLE IF NOT EXISTS api_log (\r\n\t" +
+                        "acces_time VARCHAR(255),\r\n    " +
+                        "command VARCHAR(255),\r\n    " +
+                        "arguments VARCHAR(255),\r\n    " +
+                        "result VARCHAR(255)\r\n" +
+                    ")"
+                    , conn);
                 cmd.ExecuteNonQuery();
+                cmd = new MySqlCommand("SELECT * FROM users", conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    reader.Close();
+                    CreateUser("admin", "test");
+                }
+                else
+                {
+                    reader.Close();
+                }
+
                 MySqlCommand contentCheck = new MySqlCommand("SELECT * FROM cereal", conn);
-                int rowNumber = contentCheck.ExecuteNonQuery();
+                MySqlDataReader contentReader = contentCheck.ExecuteReader();
+
+                bool hasRows = contentReader.HasRows;
                 conn.Close();
-                Console.WriteLine("loading data");
-                string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Cereal.csv");
+                if (!hasRows && env != null)
+                {
+                    Console.WriteLine("loading data");
+                    string path = Path.Combine(env.WebRootPath, "Data");
+                    InsertFromCSV(path, "Cereal.csv");
+                }
+            }
+        }
+
+        public void InsertFromCSV(string filePath, string fileName)
+        {
+            try
+            {
+                var csv = File.ReadAllText(Path.Combine(filePath, fileName));
+                foreach (var line in CsvReader.ReadFromText(csv))
+                {
+                    if (line[0].Length > 0)
+                    {
+                        Cereal cereal = new Cereal();
+                        cereal.Name = line[0];
+                        cereal.MFR = line[1][0];
+                        cereal.Type = line[2][0];
+                        cereal.Calories = int.Parse(line[3]);
+                        cereal.Protein = int.Parse(line[4]);
+                        cereal.Fat = int.Parse(line[5]);
+                        cereal.Sodium = int.Parse(line[6]);
+                        cereal.Fiber = float.Parse(line[7]);
+                        cereal.Carbo = float.Parse(line[8]);
+                        cereal.Sugars = int.Parse(line[9]);
+                        cereal.Potass = int.Parse(line[10]);
+                        cereal.Vitamins = int.Parse(line[11]);
+                        cereal.Shelf = int.Parse(line[12]);
+                        cereal.Weight = float.Parse(line[13]);
+                        cereal.Cups = float.Parse(line[14]);
+                        cereal.Rating = line[15];
+                        AddCereal(cereal);
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e.ToString());
+                throw new Exception("File could not be loaded");
+            }
+
+        }
+
+        private void CreateUser(string username, string password)
+        {
+            byte[] salt = RandomNumberGenerator.GetBytes(16);
+
+            string hashedPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(password);
+            using (MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;database=cerealdb;user=root;password=test"))
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand($"SELECT * FROM users WHERE username = \"{username}\"", conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                bool contains = reader.HasRows;
+                reader.Close();
+
+                cmd.ExecuteNonQuery();
+                if (!contains)
+                {
+                    cmd = new MySqlCommand($"INSERT INTO users VALUES(\"{username}\", \"{hashedPassword}\")", conn);
+                }
+                else
+                {
+                    cmd = new MySqlCommand($"UPDATE users SET psswrd = \"{hashedPassword}\" WHERE username = \"{username}\"", conn);
+                }
+                cmd.ExecuteNonQuery();
+                conn.Close();
             }
         }
 
@@ -573,6 +678,15 @@ namespace CerealAPI.Models
                 }
                 reader.Close();
                 return res;
+            }
+        }
+        public void LogAPICall(string timestamp, string method, string arguments, string result)
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand($"INSERT INTO api_log VALUES(\"{timestamp}\", \"{method}\", \"{arguments}\", \"{result}\")", conn);
+                cmd.ExecuteNonQuery();
             }
         }
     }

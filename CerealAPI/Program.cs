@@ -38,5 +38,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAuthorization();
 app.MapControllers();
-
+CerealContext context = new CerealContext(builder.Configuration.GetConnectionString("DefaultConnection"));
+context.CreateDB(app.Environment);
 app.Run();
+

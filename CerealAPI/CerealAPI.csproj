@@ -339,7 +339,7 @@
     <Content Update="wwwroot\Cereal Pictures\Wheaties.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\Cereal.csv">
+    <Content Update="wwwroot\Data\Cereal.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
