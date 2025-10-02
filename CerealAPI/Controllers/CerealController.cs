@@ -39,136 +39,161 @@ namespace CerealAPI.Controllers
             return Ok(cerealContext.GetAllCereals());
         }
 
-        [HttpDelete(Name = "DeleteCereal")]
-        public IActionResult DeleteCereal(int id)
+       
+        private bool Login(string username, string password)
         {
-           bool deleted = cerealContext.DeleteCereal(id);
-           if(deleted)
-           {
-                return Ok("Deleted the requested cereal");
-           }
-           else
-           {
-                return Ok($"No cereal with id {id} was found");
-           }
+            return cerealContext.VerifyUser(username, password);
         }
 
-        [HttpPost(Name = "AddCereal")]
-        public IActionResult AddCereal(int? id, string name, string manufacturer, string? type, int? calories, int? protein, int? fat, int? sodium, float? fiber, float? carbo, int? sugars, int? potass, int? vitamins, int? shelf, float? weight, float? cups, string? rating)
+        [HttpDelete(Name = "DeleteCereal")]
+        public IActionResult DeleteCereal(string username, string password, int id)
         {
-            Cereal cereal = new Cereal()
+            if(Login(username, password))
             {
-                Name = name,
-                MFR = manufacturer[0],
-                Type = 'N',
-                Calories = -1,
-                Protein = -1,
-                Fat = -1,
-                Sodium = -1,
-                Fiber = -1,
-                Carbo = -1,
-                Sugars = -1,
-                Potass = -1,
-                Vitamins = -1,
-                Shelf = -1,
-                Weight = -1,
-                Cups = -1,
-                Rating = ""
-            };
-
-            if (type != null)
-            {
-                cereal.Type = type[0];
-            }
-            if (calories != null)
-            {
-                cereal.Calories = (int)calories;
-            }
-            if (protein != null)
-            {
-                cereal.Protein = (int)protein;
-            }
-            if (fat != null)
-            {
-                cereal.Fat = (int)fat;
-            }
-            if (sodium != null)
-            {
-                cereal.Sodium = (int)sodium;
-            }
-            if (fiber != null)
-            {
-                cereal.Fiber = (float)fiber;
-            }
-            if (carbo != null)
-            {
-                cereal.Carbo = (float)carbo;
-            }
-            if (sugars != null)
-            {
-                cereal.Sugars = (int)sugars;
-            }
-            if (potass != null)
-            {
-                cereal.Potass = (int)potass;
-            }
-            if (vitamins != null)
-            {
-                cereal.Vitamins = (int)vitamins;
-            }
-            if (shelf != null)
-            {
-                cereal.Shelf = (int)shelf;
-            }
-            if (weight != null)
-            {
-                cereal.Weight = (float)weight;
-            }
-            if (cups != null)
-            {
-                cereal.Cups = (float)cups;
-            }
-            if (rating != null)
-            {
-                cereal.Rating = rating;
-            }
-            if (id != null)
-            {
-                if (cerealContext.ContainsId((int)id))
+                bool deleted = cerealContext.DeleteCereal(id);
+                if (deleted)
                 {
-                    cereal.Id = (int)id;
-                    cereal = cerealContext.UpdateCereal(cereal);
-                    return Ok(cereal);
+                    return Ok("Deleted the requested cereal");
                 }
                 else
                 {
-                    if(name.ToLower() == "teapot")
-                    {
-                        return BadRequest(StatusCodes.Status418ImATeapot + ": i'm a teapot which doesn't exists. id must be null or an existing value");
-                    }
-                    return NotFound("id must be null or an existing value");
+                    return Ok($"No cereal with id {id} was found");
                 }
             }
-            else 
+            else
             {
-                
-                cerealContext.AddCereal(cereal);
-                return Ok(cereal);
+                return BadRequest("invalid username or password");
+            }
+        }
+
+        [HttpPost(Name = "AddCereal")]
+        public IActionResult AddCereal(string username, string password, int? id, string name, string manufacturer, string? type, int? calories, int? protein, int? fat, int? sodium, float? fiber, float? carbo, int? sugars, int? potass, int? vitamins, int? shelf, float? weight, float? cups, string? rating)
+        {
+            if(Login(username, password))
+            {
+                Cereal cereal = new Cereal()
+                {
+                    Name = name,
+                    MFR = manufacturer[0],
+                    Type = 'N',
+                    Calories = -1,
+                    Protein = -1,
+                    Fat = -1,
+                    Sodium = -1,
+                    Fiber = -1,
+                    Carbo = -1,
+                    Sugars = -1,
+                    Potass = -1,
+                    Vitamins = -1,
+                    Shelf = -1,
+                    Weight = -1,
+                    Cups = -1,
+                    Rating = ""
+                };
+
+                if (type != null)
+                {
+                    cereal.Type = type[0];
+                }
+                if (calories != null)
+                {
+                    cereal.Calories = (int)calories;
+                }
+                if (protein != null)
+                {
+                    cereal.Protein = (int)protein;
+                }
+                if (fat != null)
+                {
+                    cereal.Fat = (int)fat;
+                }
+                if (sodium != null)
+                {
+                    cereal.Sodium = (int)sodium;
+                }
+                if (fiber != null)
+                {
+                    cereal.Fiber = (float)fiber;
+                }
+                if (carbo != null)
+                {
+                    cereal.Carbo = (float)carbo;
+                }
+                if (sugars != null)
+                {
+                    cereal.Sugars = (int)sugars;
+                }
+                if (potass != null)
+                {
+                    cereal.Potass = (int)potass;
+                }
+                if (vitamins != null)
+                {
+                    cereal.Vitamins = (int)vitamins;
+                }
+                if (shelf != null)
+                {
+                    cereal.Shelf = (int)shelf;
+                }
+                if (weight != null)
+                {
+                    cereal.Weight = (float)weight;
+                }
+                if (cups != null)
+                {
+                    cereal.Cups = (float)cups;
+                }
+                if (rating != null)
+                {
+                    cereal.Rating = rating;
+                }
+                if (id != null)
+                {
+                    if (cerealContext.ContainsId((int)id))
+                    {
+                        cereal.Id = (int)id;
+                        cereal = cerealContext.UpdateCereal(cereal);
+                        return Ok(cereal);
+                    }
+                    else
+                    {
+                        if (name.ToLower() == "teapot")
+                        {
+                            return BadRequest(StatusCodes.Status418ImATeapot + ": i'm a teapot which doesn't exists. id must be null or an existing value");
+                        }
+                        return NotFound("id must be null or an existing value");
+                    }
+                }
+                else
+                {
+
+                    cerealContext.AddCereal(cereal);
+                    return Ok(cereal);
+                }
+            }
+            else
+            {
+                return BadRequest("invalid username or password");
             }
             
         }
 
         [HttpPut(Name = "AddOrUpdateCereal")]
-        public IActionResult AddOrUpdateCereal(string name, string manufacturer, string? type, int? calories, int? protein, int? fat, int? sodium, float? fiber, float? carbo, int? sugars, int? potass, int? vitamins, int? shelf, float? weight, float? cups, string? rating)
+        public IActionResult AddOrUpdateCereal(string username, string password, string name, string manufacturer, string? type, int? calories, int? protein, int? fat, int? sodium, float? fiber, float? carbo, int? sugars, int? potass, int? vitamins, int? shelf, float? weight, float? cups, string? rating)
         {
             int id = cerealContext.GetId(name, manufacturer[0]);
-            if(id == -1)
+            bool validUser = Login(username, password);
+            if(id == -1 && validUser)
             {
-                return (AddCereal(null, name, manufacturer, type, calories, protein, fat, sodium, fiber, carbo, sugars, potass, vitamins, shelf, weight, cups, rating));
+                return NotFound("No cereal with the given id was found");
+            }
+            else if(validUser)
+            {
+                return (AddCereal(username, password, id, name, manufacturer, type, calories, protein, fat, sodium, fiber, carbo, sugars, potass, vitamins, shelf, weight, cups, rating));
             }
             else
             {
-                return (AddCereal(id, name, manufacturer, type, calories, protein, fat, sodium, fiber, carbo, sugars, potass, vitamins, shelf, weight, cups, rating));
+                return BadRequest("Invalid username or password");
             }
         }
     }

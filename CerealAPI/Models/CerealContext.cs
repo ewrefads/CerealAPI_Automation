@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.FileIO;
 using MySql.Data.MySqlClient;
+using Mysqlx.Crud;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -512,6 +513,34 @@ namespace CerealAPI.Models
                 conn.Close();
                 Console.WriteLine("loading data");
                 string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Cereal.csv");
+            }
+        }
+
+        public bool VerifyUser(string username, string password)
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                bool res = false;
+                MySqlCommand cmd = new MySqlCommand($"SELECT psswrd FROM users WHERE username = \"{username}\"", conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                if(reader.HasRows)
+                {
+                    string hash = "";
+                    while(reader.Read())
+                    {
+                        hash = reader.GetString("psswrd");
+                        
+                    }
+                    
+                    if (BCrypt.Net.BCrypt.EnhancedVerify(password, hash))
+                    {
+                        res = true;
+                        
+                    }
+                }
+                reader.Close();
+                return res;
             }
         }
     }
