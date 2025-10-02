@@ -1,3 +1,4 @@
+using CerealAPI.Controllers;
 using CerealAPI.Models;
 using Microsoft.Extensions.FileProviders;
 using System.Configuration;
@@ -19,14 +20,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = app.Environment.WebRootFileProvider
-});
+
 app.UseHttpsRedirection();
-
+app.UseStaticFiles();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

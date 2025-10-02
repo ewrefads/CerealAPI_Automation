@@ -1,6 +1,7 @@
 ﻿using CerealAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Buffers.Text;
 
 namespace CerealAPI.Controllers
 {
@@ -11,11 +12,13 @@ namespace CerealAPI.Controllers
         CerealContext cerealContext;
 
         private readonly ILogger<CerealController> _logger;
+        
 
         public CerealController(ILogger<CerealController> logger)
         {
             _logger = logger;
             cerealContext = new CerealContext("server=localhost;port=3306;database=cerealdb;user=root;password=test");
+            
         }
 
         /*// GET: /<controller>/
@@ -26,6 +29,7 @@ namespace CerealAPI.Controllers
         }*/
 
         [HttpGet(Name = "GetCereals")]
+        [ActionName("GetCereal")]
         public IActionResult Get(int? id, string? name, string? manufacturer, string? type, int? calories, int? protein, int? fat, int? sodium, float? fiber, float? carbo, int? sugars, int? potass, int? vitamins, int? shelf, float? weight, float? cups, string? rating)
         {
             if (id != null)
@@ -39,6 +43,7 @@ namespace CerealAPI.Controllers
             return Ok(cerealContext.GetAllCereals());
         }
 
+        
        
         private bool Login(string username, string password)
         {

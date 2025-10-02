@@ -17,6 +17,86 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\Cereal Pictures\100%25Bran.jpg" />
+    <None Include="wwwroot\Cereal Pictures\100%25NaturalBran.jpg" />
+    <None Include="wwwroot\Cereal Pictures\All-Bran with Extra Fiber.jpg" />
+    <None Include="wwwroot\Cereal Pictures\All-Bran.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Almond Delight.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Apple Cinnamon Cheerios.png" />
+    <None Include="wwwroot\Cereal Pictures\Apple Jacks.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Basic 4.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Bran Chex.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Bran Flakes.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Cap%27n%27Crunch.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Cheerios.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Cinnamon Toast Crunch.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Clusters.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Cocoa Puffs.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Corn Chex.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Corn Flakes.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Corn Pops.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Count Chocula.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Cracklin%27 Oat Bran.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Cream of Wheat %28Quick%29.png" />
+    <None Include="wwwroot\Cereal Pictures\Crispix.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Crispy Wheat &amp; Raisins.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Double Chex.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Froot Loops.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Frosted Flakes.png" />
+    <None Include="wwwroot\Cereal Pictures\Frosted Mini-Wheats.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Fruit &amp; Fibre Dates, Walnuts, and Oats.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Fruitful Bran.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Fruity Pebbles.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Golden Crisp.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Golden Grahams.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Grape Nuts Flakes.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Grape-Nuts.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Great Grains Pecan.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Honey Graham Ohs.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Honey nut Cheerios.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Honey-comb.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Just Right Crunchy Nuggets.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Just Right Fruit &amp; Nut.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Kix.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Life.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Lucky Charms.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Maypo.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Muesli Raisins, Dates, &amp; Almons.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Muesli Raisins, Peaches, &amp; Pecans.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Mueslix Crispy Blend.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Multi-Grain Cheerios.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Nut&amp;Honey Crunch.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Nutri-Grain Almond-Raisin.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Nutri-Grain Wheat.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Oatmeal Raisin Crisp.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Post Nat, Raisin Bran.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Product 19.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Puffed Rice.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Puffed Wheat.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Quaker Oat Squares.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Quaker Oatmeal.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Raisin Bran.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Raisin Nut Bran.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Raisin Squares.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Rice Chex.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Rice Krispies.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Shredded Wheat spoon size.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Shredded Wheat%27n%27Bran.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Shredded Wheat.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Smacks.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Special K.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Strawberry Fruit Wheats.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Total Corn Flakes.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Total Raisin Bran.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Total Whole Grain.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Triples.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Trix.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Wheat Chex.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Wheaties Honey Gold.jpg" />
+    <None Include="wwwroot\Cereal Pictures\Wheaties.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Csv" Version="2.0.170" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.3.0" />
@@ -28,6 +108,237 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="wwwroot\Cereal Pictures\100%25Bran.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\100%25NaturalBran.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\All-Bran with Extra Fiber.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\All-Bran.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Almond Delight.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Apple Cinnamon Cheerios.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Apple Jacks.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Basic 4.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Bran Chex.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Bran Flakes.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Cap%27n%27Crunch.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Cheerios.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Cinnamon Toast Crunch.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Clusters.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Cocoa Puffs.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Corn Chex.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Corn Flakes.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Corn Pops.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Count Chocula.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Cracklin%27 Oat Bran.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Cream of Wheat %28Quick%29.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Crispix.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Crispy Wheat &amp; Raisins.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Double Chex.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Froot Loops.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Frosted Flakes.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Frosted Mini-Wheats.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Fruit &amp; Fibre Dates, Walnuts, and Oats.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Fruitful Bran.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Fruity Pebbles.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Golden Crisp.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Golden Grahams.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Grape Nuts Flakes.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Grape-Nuts.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Great Grains Pecan.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Honey Graham Ohs.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Honey nut Cheerios.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Honey-comb.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Just Right Crunchy Nuggets.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Just Right Fruit &amp; Nut.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Kix.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Life.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Lucky Charms.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Maypo.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Muesli Raisins, Dates, &amp; Almons.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Muesli Raisins, Peaches, &amp; Pecans.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Mueslix Crispy Blend.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Multi-Grain Cheerios.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Nut&amp;Honey Crunch.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Nutri-Grain Almond-Raisin.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Nutri-Grain Wheat.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Oatmeal Raisin Crisp.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Post Nat, Raisin Bran.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Product 19.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Puffed Rice.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Puffed Wheat.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Quaker Oat Squares.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Quaker Oatmeal.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Raisin Bran.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Raisin Nut Bran.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Raisin Squares.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Rice Chex.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Rice Krispies.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Shredded Wheat spoon size.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Shredded Wheat%27n%27Bran.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Shredded Wheat.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Smacks.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Special K.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Strawberry Fruit Wheats.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Total Corn Flakes.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Total Raisin Bran.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Total Whole Grain.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Triples.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Trix.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Wheat Chex.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Wheaties Honey Gold.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Cereal Pictures\Wheaties.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="wwwroot\Cereal.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
