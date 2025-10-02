@@ -30,7 +30,7 @@ namespace CerealAPI.Controllers
 
         [HttpGet(Name = "GetCereals")]
         [ActionName("GetCereal")]
-        public IActionResult Get(int? id, string? name, string? manufacturer, string? type, int? calories, int? protein, int? fat, int? sodium, float? fiber, float? carbo, int? sugars, int? potass, int? vitamins, int? shelf, float? weight, float? cups, string? rating)
+        public IActionResult Get(int? id, string? name, string? manufacturer, string? type, string? calories, string? protein, string? fat, string? sodium, string? fiber, string? carbo, string? sugars, string? potass, string? vitamins, string? shelf, string? weight, string? cups, string? rating, string? sort)
         {
             if (id != null)
             {
@@ -38,9 +38,9 @@ namespace CerealAPI.Controllers
             }
             if (name != null || manufacturer != null || type != null || calories != null || protein != null || fat != null || sodium != null || fiber != null || carbo != null || sugars != null || potass != null || vitamins != null || shelf != null || weight != null || cups != null || rating != null)
             {
-                return Ok(cerealContext.GetFilteredCereals(name, manufacturer, type, calories, protein, fat, sodium, fiber, carbo, sugars, potass, vitamins, shelf, weight, cups, rating));
+                return Ok(cerealContext.GetFilteredCereals(name, manufacturer, type, calories, protein, fat, sodium, fiber, carbo, sugars, potass, vitamins, shelf, weight, cups, rating, sort));
             }
-            return Ok(cerealContext.GetAllCereals());
+            return Ok(cerealContext.GetAllCereals(sort));
         }
 
         

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Xml;
 namespace CerealAPI.Models
 {
     internal class CerealContext
@@ -24,13 +25,23 @@ namespace CerealAPI.Models
             return new MySqlConnection(ConnectionString);
         }
 
-        public List<Cereal> GetAllCereals()
+        public List<Cereal> GetAllCereals(string? sort)
         {
             List<Cereal> list = new List<Cereal>();
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT * FROM cereal", conn);
+                string cmdText = "SELECT * FROM cereal";
+                if(sort != null)
+                {
+                    string[] sortWords = sort.Split('_');
+                    cmdText += " ORDER BY " + CollumnTranslate(sortWords[0]);
+                    if(sortWords.Length > 1)
+                    {
+                        cmdText += " " + sortWords[1];
+                    }
+                }
+                MySqlCommand cmd = new MySqlCommand(cmdText, conn);
                 using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -89,7 +100,22 @@ namespace CerealAPI.Models
                 return contains;
             }
         }
-        public List<Cereal> GetFilteredCereals(string? name, string? mfr, string? type, int? calories, int? protein, int? fat, int? sodium, float? fiber, float? carbo, int? sugars, int? potass, int? vitamins, int? shelf, float? weight, float? cups, string? rating)
+
+        private string CollumnTranslate(string collumn)
+        {
+            switch(collumn.ToLower())
+            {
+                case ("name"):
+                    return "cereal_name";
+                case ("manufacturer"):
+                    return "mfr";
+                case ("type"):
+                    return "cereal_type";
+                default:
+                    return collumn;
+            }
+        }
+        public List<Cereal> GetFilteredCereals(string? name, string? mfr, string? type, string? calories, string? protein, string? fat, string? sodium, string? fiber, string? carbo, string? sugars, string? potass, string? vitamins, string? shelf, string? weight, string? cups, string? rating, string? sort)
         {
             List<Cereal> filteredList = new List<Cereal>();
             using (MySqlConnection conn = GetConnection())
@@ -152,55 +178,64 @@ namespace CerealAPI.Models
                 }
                 if(calories != null)
                 {
-                    filter = AddIntFilter(filter, "calories", (int)calories);
+                    filter = AddNumericFilter(filter, "calories", calories);
                 }
                 if (protein != null)
                 {
-                    filter = AddIntFilter(filter, "protein", (int)protein);
+                    filter = AddNumericFilter(filter, "protein", protein);
                 }
                 if (fat != null)
                 {
-                    filter = AddIntFilter(filter, "fat", (int)fat);
+                    filter = AddNumericFilter(filter, "fat", fat);
                 }
                 if (sodium != null)
                 {
-                    filter = AddIntFilter(filter, "sodium", (int)sodium);
+                    filter = AddNumericFilter(filter, "sodium", sodium);
                 }
                 if (fiber != null)
                 {
-                    filter = AddFloatFilter(filter, "fiber", (float)fiber);
+                    filter = AddNumericFilter(filter, "fiber", fiber);
                 }
                 if (carbo != null)
                 {
-                    filter = AddFloatFilter(filter, "carbo", (float)carbo);
+                    filter = AddNumericFilter(filter, "carbo", carbo);
                 }
                 if (sugars != null)
                 {
-                    filter = AddIntFilter(filter, "sugars", (int)sugars);
+                    filter = AddNumericFilter(filter, "sugars", sugars);
                 }
                 if (potass != null)
                 {
-                    filter = AddIntFilter(filter, "potass", (int)potass);
+                    filter = AddNumericFilter(filter, "potass", potass);
                 }
                 if (vitamins != null)
                 {
-                    filter = AddIntFilter(filter, "vitamins", (int)vitamins);
+                    filter = AddNumericFilter(filter, "vitamins", vitamins);
                 }
                 if (shelf != null)
                 {
-                    filter = AddIntFilter(filter, "shelf", (int)shelf);
+                    filter = AddNumericFilter(filter, "shelf", shelf);
                 }
                 if (weight != null)
                 {
-                    filter = AddFloatFilter(filter, "weight", (float)weight);
+                    filter = AddNumericFilter(filter, "weight", weight);
                 }
                 if (cups != null)
                 {
-                    filter = AddFloatFilter(filter, "cups", (float)cups);
+                    filter = AddNumericFilter(filter, "cups", cups);
                 }
                 if(rating != null)
                 {
                     filter = AddStringFilter(filter, "rating", rating);
+                }
+                if (sort != null)
+                {
+                    string[] sortWords = sort.Split('_');
+                    filter += " ORDER BY " + CollumnTranslate(sortWords[0]);
+                    if (sortWords.Length > 1)
+                    {
+                        filter += " " + sortWords[1];
+                    }
                 }
                 MySqlCommand cmd = new MySqlCommand($"SELECT * FROM cereal WHERE {filter}", conn);
                 using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -233,22 +268,19 @@ namespace CerealAPI.Models
             return filteredList;
         }
 
-        private string AddIntFilter(string filter, string collumn, int value)
+        private string AddNumericFilter(string filter, string collumn, string value)
         {
             if(filter.Length > 0)
             {
                 filter += " AND";
             }
-            return filter += $" {collumn} = {value}";
-        }
-        private string AddFloatFilter(string filter, string collumn, float value)
-        {
-            if (filter.Length > 0)
+            if(value.Contains('=') || value.Contains('<') || value.Contains('>'))
             {
-                filter += " AND";
+                return filter += $" {collumn} {value}";
             }
             return filter += $" {collumn} = {value}";
         }
+
         private string AddStringFilter(string filter, string collumn, string value)
         {
             if (filter.Length > 0)
