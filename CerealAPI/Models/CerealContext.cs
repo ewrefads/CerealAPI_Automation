@@ -301,8 +301,6 @@ namespace CerealAPI.Models
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
-                MySqlCommand dbCmd = new MySqlCommand("USE cerealdb", conn);
-                dbCmd.ExecuteNonQuery();
                 MySqlCommand cmd = new MySqlCommand($"SELECT id FROM cereal ORDER BY id DESC LIMIT 1", conn);
                 using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
@@ -631,7 +629,7 @@ namespace CerealAPI.Models
             byte[] salt = RandomNumberGenerator.GetBytes(16);
 
             string hashedPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(password);
-            using (MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;database=cerealdb;user=root;password=test"))
+            using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
                 MySqlCommand cmd = new MySqlCommand($"SELECT * FROM users WHERE username = \"{username}\"", conn);
