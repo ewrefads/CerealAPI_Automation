@@ -9,8 +9,14 @@ using BCrypt.Net;
 
 namespace ServerConfiguration
 {
+    /// <summary>
+    /// Class to handle various admin tasks not handled directly by the server
+    /// </summary>
     public class ServerConfiguration
     {
+        /// <summary>
+        /// Sets up the server if it has not been done yet. Afterwards it takes commands to update and add users and insert new data from CSV files
+        /// </summary>
         public static void Main()
         {
             Console.WriteLine("Starting Server configuration");
@@ -19,39 +25,48 @@ namespace ServerConfiguration
             Console.WriteLine("For a list of commands type help.");
             while(active)
             {
+                //Handles userinput
                 Console.Write(" Enter command: ");
                 string command = Console.ReadLine();
                 string[] words = command.Split(" ");
                 switch(words[0].ToLower())
                 {
+                    //Ends the program
                     case ("q"):
                     case ("quit"):
                         active = false;
                         break;
+                    //Parses a given CSV file
                     case ("parse"):
                         bool valid = true;
+                        //Checks if the amount of arguments was correct
                         if(words.Length != 2)
                         {
                             valid = false;
                             Console.WriteLine("wrong number of arguments");
                         }
+                        //Checks if the file exists
                         if(valid && !File.Exists(words[1]))
                         {
                             Console.WriteLine("Could not locate file");
                             valid = false;
                         }
+                        //Parses the files
                         if(valid)
                         {
                             InsertFromCSV(words[1]);
                         }
                         break;
+                    //Adds or updates the password of a user
                     case ("user"):
                         valid = true;
+                        //Checks if the amount of arguments was correct
                         if(words.Length != 3)
                         {
                             valid = false;
                             Console.WriteLine("wrong number of arguments");
                         }
+                        //Checks if the allready user exists
                         if (valid)
                         {
                             MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;database=cerealdb;user=root;password=test");
@@ -66,6 +81,7 @@ namespace ServerConfiguration
                                     hash = reader.GetString("psswrd");
                                 }
                                 
+                                //Checks if the user knows their current password before letting the update it
                                 Console.Write("existing user found. Please enter the current username to confirm password change:");
                                 string password = TypedPassword();
                                 int triesRemaining = 3;
@@ -91,6 +107,7 @@ namespace ServerConfiguration
                             }
                         }
                         break;
+                    //Prints a list of commands and a description
                     case ("help"):
                         Console.WriteLine("parse [filename.csv]       | Parses data from a given csv file into the cereal table");
                         Console.WriteLine("user [username] [password] | Creates a new user or updates an existing users password");
@@ -105,17 +122,24 @@ namespace ServerConfiguration
             }
         }
 
+        /// <summary>
+        /// Obscures a typed password while it is being typed
+        /// </summary>
+        /// <returns>The typed password</returns>
         private static string TypedPassword()
         {
             string password = "";
             ConsoleKeyInfo info = Console.ReadKey(true);
+            //Handles keypress
             while(info.Key != ConsoleKey.Enter)
             {
+                //Adds the typed letter to the password
                 if(info.Key != ConsoleKey.Backspace)
                 {
                     Console.Write("*");
                     password += info.KeyChar;
                 }
+                //Deletes the last typed letter from password and removes the * from the console
                 else if(info.Key == ConsoleKey.Backspace && password.Length > 0)
                 {
                     password = password.Substring(0, password.Length - 1);
@@ -130,6 +154,9 @@ namespace ServerConfiguration
             return password;
         }
 
+        /// <summary>
+        /// Creates the database. See the same method in cerealcontext for more info
+        /// </summary>
         private static void CreateDB()
         {
             using (MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;user=root;password=test"))
@@ -195,6 +222,11 @@ namespace ServerConfiguration
             }
         }
 
+        /// <summary>
+        /// Inserts data into the database from a given CSV file
+        /// </summary>
+        /// <param name="filepath">The location of the CSV file</param>
+        /// <exception cref="Exception">An Exception is thrown if there was any issues with the file</exception>
         public static void InsertFromCSV(string filepath)
         {
             try
@@ -233,6 +265,10 @@ namespace ServerConfiguration
 
         }
 
+        /// <summary>
+        /// Adds a cereal to the server. See similar method in CerealContext for more info
+        /// </summary>
+        /// <param name="cereal"></param>
         public static void AddCereal(Cereal cereal)
         {
             using (MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;database=cerealdb;user=root;password=test"))
@@ -271,10 +307,13 @@ namespace ServerConfiguration
             }
         }
 
+        /// <summary>
+        /// Adds a user updates their password. See method in CerealContext
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
         private static void CreateUser(string username, string password)
         {
-            byte[] salt = RandomNumberGenerator.GetBytes(16);
-            
             string hashedPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(password);
             using (MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;database=cerealdb;user=root;password=test"))
             {
@@ -298,7 +337,4 @@ namespace ServerConfiguration
             }
         }
     }
-
-
-
 }

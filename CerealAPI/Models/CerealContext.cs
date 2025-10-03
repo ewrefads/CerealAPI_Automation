@@ -13,6 +13,9 @@ using System.Security.Cryptography;
 using System.Xml;
 namespace CerealAPI.Models
 {
+    /// <summary>
+    /// A class to handle communication with the sql server
+    /// </summary>
     public class CerealContext
     {
         public string ConnectionString { get; set; }
@@ -22,8 +25,13 @@ namespace CerealAPI.Models
             ConnectionString = connectionString;
         }
 
+        /// <summary>
+        /// Creates a MySQLConnection based on the connectionstring
+        /// </summary>
+        /// <returns>a MySQLConnection</returns>
         public MySqlConnection GetConnection()
         {
+            //Used for testing. Sets the database to the given one
             if(DatabaseName != null && DatabaseName != "")
             {
                 ConnectionString = $"server=localhost;port=3306;database={DatabaseName};user=root;password=test";
@@ -32,6 +40,11 @@ namespace CerealAPI.Models
             return new MySqlConnection(ConnectionString);
         }
 
+        /// <summary>
+        /// Returns all cereals in the database and optionally sorts them
+        /// </summary>
+        /// <param name="sort">the value to sort by and optionally whether it should be descending or ascending</param>
+        /// <returns>A List with all cereals in the database</returns>
         public List<Cereal> GetAllCereals(string? sort)
         {
             List<Cereal> list = new List<Cereal>();
@@ -39,6 +52,7 @@ namespace CerealAPI.Models
             {
                 conn.Open();
                 string cmdText = "SELECT * FROM cereal";
+                //Inserts the sorting if it was desired
                 if(sort != null)
                 {
                     string[] sortWords = sort.Split('_');
@@ -49,6 +63,7 @@ namespace CerealAPI.Models
                     }
                 }
                 MySqlCommand cmd = new MySqlCommand(cmdText, conn);
+                //Creates the list
                 using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -79,6 +94,11 @@ namespace CerealAPI.Models
             return list;
         }
 
+        /// <summary>
+        /// Tries to delete the cereal with the given id and tells whether it was succesful
+        /// </summary>
+        /// <param name="id">The id of the cereal to be deleted</param>
+        /// <returns>Whether a cereal was deleted</returns>
         public bool DeleteCereal(int id)
         {
             using (MySqlConnection conn = GetConnection())
@@ -95,6 +115,11 @@ namespace CerealAPI.Models
             }
         }
 
+        /// <summary>
+        /// Checks whether a given id is in the database
+        /// </summary>
+        /// <param name="id">The id to be checked</param>
+        /// <returns>Whether the id is in the database</returns>
         public bool ContainsId(int id)
         {
             using (MySqlConnection conn = GetConnection())
@@ -108,6 +133,11 @@ namespace CerealAPI.Models
             }
         }
 
+        /// <summary>
+        /// replaces the names used in the API to the ones used by the database
+        /// </summary>
+        /// <param name="collumn">The string given from the API</param>
+        /// <returns>The name used by the database</returns>
         private string CollumnTranslate(string collumn)
         {
             switch(collumn.ToLower())
@@ -122,12 +152,35 @@ namespace CerealAPI.Models
                     return collumn;
             }
         }
+
+        /// <summary>
+        /// Get a list of cereals matching the given filters. Numeric ones support range based filters with the operator before the number. For example >=1
+        /// </summary>
+        // <param name="name">The name of the cereal</param>
+        /// <param name="manufacturer">The manufacturerer of the cereal</param>
+        /// <param name="type">The type of cereal</param>
+        /// <param name="calories">The amount of calories in the cereal. Supports range based filtering</param>
+        /// <param name="protein">The amount of protein in the cereal. Supports range based filtering</param>
+        /// <param name="fat">The amount of fat in the cereal. Supports range based filtering</param>
+        /// <param name="sodium">The amount of sodium in the cereal. Supports range based filtering</param>
+        /// <param name="fiber">The amount of fiber in the cereal. Supports range based filtering</param>
+        /// <param name="carbo">The amount of carbo in the cereal. Supports range based filtering</param>
+        /// <param name="sugars">The amount of sugar in the cereal. Supports range based filtering</param>
+        /// <param name="potass">The amount of potass in the cereal. Supports range based filtering</param>
+        /// <param name="vitamins">The amount of vitamins in the cereal. Supports range based filtering</param>
+        /// <param name="shelf">Which shelf to place it on. Supports range based filtering</param>
+        /// <param name="weight">The weight of the cereal. Supports range based filtering></param>
+        /// <param name="cups">The amount of cups pr. portion. Supports range based filtering</param>
+        /// <param name="rating">The rating of the cereal</param>
+        /// <param name="sort">Which value to sort by. _ASC or _DSC can optionally be added to tell whether it should be in ascending or descending order</param>
+        /// <returns></returns>
         public List<Cereal> GetFilteredCereals(string? name, string? mfr, string? type, string? calories, string? protein, string? fat, string? sodium, string? fiber, string? carbo, string? sugars, string? potass, string? vitamins, string? shelf, string? weight, string? cups, string? rating, string? sort)
         {
             List<Cereal> filteredList = new List<Cereal>();
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
+                //Starts by creating a complete filter based on which variables was given a value
                 string filter = "";
                 if(name != null)
                 {
@@ -135,6 +188,7 @@ namespace CerealAPI.Models
                 }
                 if(mfr != null)
                 {
+                    //Replaces the full name or a an acronym of the manufacturer with the letters used by the database
                     if(mfr.Length > 1)
                     {
                         switch(mfr.ToLower())
@@ -235,6 +289,7 @@ namespace CerealAPI.Models
                 {
                     filter = AddStringFilter(filter, "rating", rating);
                 }
+                //Adds the sorting if it was given
                 if (sort != null)
                 {
                     string[] sortWords = sort.Split('_');
@@ -244,6 +299,7 @@ namespace CerealAPI.Models
                         filter += " " + sortWords[1];
                     }
                 }
+                //Executes the command and creates the list
                 MySqlCommand cmd = new MySqlCommand($"SELECT * FROM cereal WHERE {filter}", conn);
                 using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
@@ -275,12 +331,20 @@ namespace CerealAPI.Models
             return filteredList;
         }
 
+        /// <summary>
+        /// Handles filters for numeric values
+        /// </summary>
+        /// <param name="filter">The filter so far</param>
+        /// <param name="collumn">which collumn should it apply to</param>
+        /// <param name="value">the value to filter by</param>
+        /// <returns>The updated filter</returns>
         private string AddNumericFilter(string filter, string collumn, string value)
         {
             if(filter.Length > 0)
             {
                 filter += " AND";
             }
+            //if it is a range based filter it gets added directly
             if(value.Contains('=') || value.Contains('<') || value.Contains('>'))
             {
                 return filter += $" {collumn} {value}";
@@ -288,6 +352,13 @@ namespace CerealAPI.Models
             return filter += $" {collumn} = {value}";
         }
 
+        /// <summary>
+        /// Handles filtering based on strings
+        /// </summary>
+        /// <param name="filter">The filter so far</param>
+        /// <param name="collumn">The collumn which should be filtered</param>
+        /// <param name="value">The value to filter by</param>
+        /// <returns>The updated filter</returns>
         private string AddStringFilter(string filter, string collumn, string value)
         {
             if (filter.Length > 0)
@@ -296,6 +367,11 @@ namespace CerealAPI.Models
             }
             return filter += $" {collumn} = \"{value}\"";
         }
+
+        /// <summary>
+        /// Adds a cereal to the database
+        /// </summary>
+        /// <param name="cereal">The cereal to be added</param>
         public void AddCereal(Cereal cereal)
         {
             using (MySqlConnection conn = GetConnection())
@@ -318,12 +394,19 @@ namespace CerealAPI.Models
                 }
             }
         }
+
+        /// <summary>
+        /// Updates the info in the database for the given cereal
+        /// </summary>
+        /// <param name="cereal">The cereal to be updated</param>
+        /// <returns>The updated cereal</returns>
         public Cereal UpdateCereal(Cereal cereal)
         {
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
                 Cereal c = GetCereal(cereal.Id);
+                //Finds which info to update
                 string updateValues = "";
                 if(cereal.Name != c.Name && cereal.Name.Length != 0)
                 {
@@ -449,6 +532,7 @@ namespace CerealAPI.Models
                     }
                     updateValues += $"rating = \"{cereal.Rating}\"";
                 }
+                //Updates the cereal based on the values which varied from the database
                 if (updateValues.Length > 0)
                 {
                     MySqlCommand updateCommand = new MySqlCommand($"UPDATE cereal SET {updateValues} WHERE id = {cereal.Id}", conn);
@@ -457,6 +541,12 @@ namespace CerealAPI.Models
                 return GetCereal(cereal.Id);
             }
         }
+
+        /// <summary>
+        /// Retrieves a cereal from the database based on the given id
+        /// </summary>
+        /// <param name="id">The id of the desired cereal</param>
+        /// <returns>The cereal with the id</returns>
         public Cereal GetCereal(int id)
         {
             using (MySqlConnection conn = GetConnection())
@@ -501,6 +591,12 @@ namespace CerealAPI.Models
             }
         }
 
+        /// <summary>
+        /// Gets the id of a cereal based on its name and manufacturer
+        /// </summary>
+        /// <param name="name">The name of the cereal</param>
+        /// <param name="mfr">The manufacturer of the cereal</param>
+        /// <returns>The id of the cereal</returns>
         public int GetId(string name, char mfr)
         {
             using (MySqlConnection conn = GetConnection())
@@ -516,6 +612,11 @@ namespace CerealAPI.Models
                 return id;
             }
         }
+
+        /// <summary>
+        /// Creates the database and sets up the initial values in the database if it has not been done yet
+        /// </summary>
+        /// <param name="env">The webhost environment of the server</param>
         public void CreateDB(IWebHostEnvironment env)
         {
             using (MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;user=root;password=test"))
@@ -526,6 +627,7 @@ namespace CerealAPI.Models
                 {
                     db = DatabaseName;
                 }
+                //Creates the database and the various tables
                 MySqlCommand cmd = new MySqlCommand(
                     $"CREATE DATABASE IF NOT EXISTS {db};\r\n" +
                     $"USE {db};\r\n" +
@@ -562,6 +664,7 @@ namespace CerealAPI.Models
                 cmd.ExecuteNonQuery();
                 cmd = new MySqlCommand("SELECT * FROM users", conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
+                //Creates the initial admin user if it does not exists
                 if (!reader.HasRows)
                 {
                     reader.Close();
@@ -577,6 +680,7 @@ namespace CerealAPI.Models
 
                 bool hasRows = contentReader.HasRows;
                 conn.Close();
+                //Inserts data into the cereal table if it has not been populated yet
                 if (!hasRows && env != null)
                 {
                     Console.WriteLine("loading data");
@@ -586,11 +690,18 @@ namespace CerealAPI.Models
             }
         }
 
+        /// <summary>
+        /// Inserts data into the cereal table from a givne CSV file
+        /// </summary>
+        /// <param name="filePath">The folder containing the file</param>
+        /// <param name="fileName">The name of the file</param>
+        /// <exception cref="Exception">An exception thrown if the file could not be found</exception>
         public void InsertFromCSV(string filePath, string fileName)
         {
             try
             {
                 var csv = File.ReadAllText(Path.Combine(filePath, fileName));
+                //Creates a cereal for each valid line in the CSV file and adds it to the database
                 foreach (var line in CsvReader.ReadFromText(csv))
                 {
                     if (line[0].Length > 0)
@@ -624,13 +735,17 @@ namespace CerealAPI.Models
 
         }
 
+        /// <summary>
+        /// Creates a new user and hashes their password using Bcrypt
+        /// </summary>
+        /// <param name="username">the desired username</param>
+        /// <param name="password">the desired password</param>
         private void CreateUser(string username, string password)
         {
-            byte[] salt = RandomNumberGenerator.GetBytes(16);
-
             string hashedPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(password);
             using (MySqlConnection conn = GetConnection())
             {
+                //Checks whether the user is allready in the database
                 conn.Open();
                 MySqlCommand cmd = new MySqlCommand($"SELECT * FROM users WHERE username = \"{username}\"", conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
@@ -638,6 +753,7 @@ namespace CerealAPI.Models
                 reader.Close();
 
                 cmd.ExecuteNonQuery();
+                //Adds the user to the database or updates their password if they allready exists
                 if (!contains)
                 {
                     cmd = new MySqlCommand($"INSERT INTO users VALUES(\"{username}\", \"{hashedPassword}\")", conn);
@@ -651,6 +767,12 @@ namespace CerealAPI.Models
             }
         }
 
+        /// <summary>
+        /// Checks whether the given userinfo was correct
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns>whether the userinfo was valid</returns>
         public bool VerifyUser(string username, string password)
         {
             using (MySqlConnection conn = GetConnection())
@@ -678,6 +800,14 @@ namespace CerealAPI.Models
                 return res;
             }
         }
+
+        /// <summary>
+        /// Saves a given API call to the database
+        /// </summary>
+        /// <param name="timestamp">When the call happened</param>
+        /// <param name="method">Which method was used</param>
+        /// <param name="arguments">Which arguments was given</param>
+        /// <param name="result">What status code was given</param>
         public void LogAPICall(string timestamp, string method, string arguments, string result)
         {
             using (MySqlConnection conn = GetConnection())

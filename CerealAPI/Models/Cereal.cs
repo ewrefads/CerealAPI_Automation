@@ -2,6 +2,9 @@
 
 namespace CerealAPI.Models
 {
+    /// <summary>
+    /// A class representaion of a row in the cereal table
+    /// </summary>
     public class Cereal
     {
         private CerealContext context;

@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CerealAPI.Controllers
 {
+    /// <summary>
+    /// Controller for filehandling API
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class FileController : Controller
@@ -23,16 +26,23 @@ namespace CerealAPI.Controllers
             filepath = Path.Combine(env.WebRootPath, "Cereal Pictures");
         }
 
+        /// <summary>
+        /// Retrieves the image for a cereal with the given id
+        /// </summary>
+        /// <param name="id">The id of the desired cereal</param>
+        /// <returns>Whether the operation was succesful and if it was the image</returns>
         [HttpGet(Name = "GetImage")]
         public IActionResult GetImage(int id)
         {
             Cereal cereal = cerealContext.GetCereal(id);
+            //Returns the image if the id was valid
             if (cereal.Name != null)
             {
                 var stream = new FileStream(Path.Combine(filepath, cereal.Name + ".jpg"), FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true);
                 cerealContext.LogAPICall(DateTime.Now.ToString(), "GetImage", id.ToString(), "200:Ok");
                 return File(stream, mimeType, enableRangeProcessing: true);
             }
+            //Returns an error if it does not
             else
             {
                 cerealContext.LogAPICall(DateTime.Now.ToString(), "GetImage", id.ToString(), "404:Not Found");
