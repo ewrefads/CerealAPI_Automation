@@ -14,13 +14,15 @@ namespace ServerConfiguration
     /// </summary>
     public class ServerConfiguration
     {
+        
         /// <summary>
         /// Sets up the server if it has not been done yet. Afterwards it takes commands to update and add users and insert new data from CSV files
         /// </summary>
         public static void Main()
         {
             Console.WriteLine("Starting Server configuration");
-            CreateDB();
+            CerealContext cerealContext = new CerealContext("server=localhost;port=3306;database=cerealdb;user=root;password=test");
+            cerealContext.CreateDB(null);
             bool active = true;
             Console.WriteLine("For a list of commands type help.");
             while(active)
@@ -54,7 +56,7 @@ namespace ServerConfiguration
                         //Parses the files
                         if(valid)
                         {
-                            InsertFromCSV(words[1]);
+                            InsertFromCSV(words[1], cerealContext);
                         }
                         break;
                     //Adds or updates the password of a user
@@ -103,7 +105,7 @@ namespace ServerConfiguration
                             }
                             if(valid)
                             {
-                                CreateUser(words[1], words[2]);
+                                cerealContext.CreateUser(words[1], words[2]);
                             }
                         }
                         break;
@@ -155,79 +157,11 @@ namespace ServerConfiguration
         }
 
         /// <summary>
-        /// Creates the database. See the same method in cerealcontext for more info
-        /// </summary>
-        private static void CreateDB()
-        {
-            using (MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;user=root;password=test"))
-            {
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand(
-                    "CREATE DATABASE IF NOT EXISTS cerealdb;\r\n" +
-                    "USE cerealdb;\r\n" +
-                    "CREATE TABLE IF NOT EXISTS cereal (\r\n\t" +
-                        "id INT UNIQUE,\r\n    " +
-                        "cereal_name VARCHAR(255),\r\n    " +
-                        "mfr CHAR(1),\r\n    " +
-                        "cereal_type CHAR(1),\r\n    " +
-                        "calories INT,\r\n    " +
-                        "protein INT,\r\n    " +
-                        "fat INT,\r\n    " +
-                        "sodium INT,\r\n    " +
-                        "fiber FLOAT,\r\n    " +
-                        "carbo FLOAT,\r\n    " +
-                        "sugars INT,\r\n    " +
-                        "potass INT,\r\n    " +
-                        "vitamins INT,\r\n    " +
-                        "shelf INT,\r\n    " +
-                        "weight FLOAT,\r\n    " +
-                        "cups FLOAT,\r\n    " +
-                        "rating VARCHAR(255),\r\n    " +
-                        "UNIQUE KEY unique_name_mfr(cereal_name, mfr)\r\n" +
-                    ");" +
-                    "CREATE TABLE IF NOT EXISTS users (\r\n\t" +
-                        "username VARCHAR(255) UNIQUE NOT NULL,\r\n    " +
-                        "psswrd VARCHAR(255) NOT NULL\r\n);\r\n\r\n" +
-                    "CREATE TABLE IF NOT EXISTS api_log (\r\n\t" +
-                        "acces_time VARCHAR(255),\r\n    " +
-                        "command VARCHAR(255),\r\n    " +
-                        "arguments VARCHAR(255),\r\n    " +
-                        "result VARCHAR(255)\r\n" +
-                    ")"
-                    , conn);
-                cmd.ExecuteNonQuery();
-                cmd = new MySqlCommand("SELECT * FROM users", conn);
-                MySqlDataReader reader = cmd.ExecuteReader();
-                if(!reader.HasRows)
-                {
-                    reader.Close();
-                    CreateUser("admin", "test");
-                }
-                else
-                {
-                    reader.Close();
-                }
-                
-                MySqlCommand contentCheck = new MySqlCommand("SELECT * FROM cereal", conn);
-                MySqlDataReader contentReader = contentCheck.ExecuteReader();
-
-                bool hasRows = contentReader.HasRows;
-                conn.Close();
-                if (!hasRows)
-                {
-                    Console.WriteLine("loading data");
-                    string path = Path.Combine(@"Cereal.csv");
-                    InsertFromCSV(path);
-                }
-            }
-        }
-
-        /// <summary>
         /// Inserts data into the database from a given CSV file
         /// </summary>
         /// <param name="filepath">The location of the CSV file</param>
         /// <exception cref="Exception">An Exception is thrown if there was any issues with the file</exception>
-        public static void InsertFromCSV(string filepath)
+        public static void InsertFromCSV(string filepath, CerealContext cerealContext)
         {
             try
             {
@@ -253,7 +187,7 @@ namespace ServerConfiguration
                         cereal.Weight = float.Parse(line[13]);
                         cereal.Cups = float.Parse(line[14]);
                         cereal.Rating = line[15];
-                        AddCereal(cereal);
+                        cerealContext.AddCereal(cereal);
                     }
                 }
             }
@@ -265,76 +199,5 @@ namespace ServerConfiguration
 
         }
 
-        /// <summary>
-        /// Adds a cereal to the server. See similar method in CerealContext for more info
-        /// </summary>
-        /// <param name="cereal"></param>
-        public static void AddCereal(Cereal cereal)
-        {
-            using (MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;database=cerealdb;user=root;password=test"))
-            {
-                conn.Open();
-                MySqlCommand dbCmd = new MySqlCommand("USE cerealdb", conn);
-                dbCmd.ExecuteNonQuery();
-                MySqlCommand cmd = new MySqlCommand($"SELECT id FROM cereal ORDER BY id DESC LIMIT 1", conn);
-                MySqlCommand containsCommand = new MySqlCommand($"SELECT id FROM cereal WHERE cereal_name = \"{cereal.Name}\" AND mfr = \"{cereal.MFR}\"", conn);
-                MySqlDataReader containsReader = containsCommand.ExecuteReader();
-                bool contains = containsReader.HasRows;
-                containsReader.Close();
-                if (!contains)
-                {
-                    
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        int id = 0;
-                        if (reader.HasRows)
-                        {
-                            while (reader.Read())
-                            {
-                                id = reader.GetInt32("Id") + 1;
-                            }
-                        }
-                        reader.Close();
-                        MySqlCommand insertCmd = new MySqlCommand($"INSERT INTO cereal VALUES({id}, \"{cereal.Name}\", \"{cereal.MFR.ToString()}\", \"{cereal.Type.ToString()}\", {cereal.Calories}, {cereal.Protein}, {cereal.Fat}, {cereal.Sodium}, {cereal.Fiber}, {cereal.Carbo}, {cereal.Sugars}, {cereal.Potass}, {cereal.Vitamins}, {cereal.Shelf}, {cereal.Weight}, {cereal.Cups}, \"{cereal.Rating}\")", conn);
-                        insertCmd.ExecuteNonQuery();
-                    }
-                }
-                else
-                {
-                    MySqlCommand updateCommand = new MySqlCommand($"UPDATE cereal SET cereal_type = \"{cereal.Type.ToString()}\" calories = {cereal.Calories} protein = {cereal.Protein} fat = {cereal.Fat} sodium = {cereal.Sodium} fiber = {cereal.Fiber} carbo = {cereal.Carbo} sugars = {cereal.Sugars} potass = {cereal.Potass} vitamins = {cereal.Vitamins} shelf = {cereal.Shelf} weight = {cereal.Weight} cups = {cereal.Cups} rating = {cereal.Rating} WHERE cereal_name = \"{cereal.Name}\" AND mfr = \"{cereal.MFR}\"", conn);
-                    updateCommand.ExecuteNonQuery();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Adds a user updates their password. See method in CerealContext
-        /// </summary>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
-        private static void CreateUser(string username, string password)
-        {
-            string hashedPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(password);
-            using (MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;database=cerealdb;user=root;password=test"))
-            {
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand($"SELECT * FROM users WHERE username = \"{username}\"", conn);
-                MySqlDataReader reader = cmd.ExecuteReader();
-                bool contains = reader.HasRows;
-                reader.Close();
-                
-                cmd.ExecuteNonQuery();
-                if(!contains)
-                {
-                    cmd = new MySqlCommand($"INSERT INTO users VALUES(\"{username}\", \"{hashedPassword}\")", conn);
-                }
-                else
-                {
-                    cmd = new MySqlCommand($"UPDATE users SET psswrd = \"{hashedPassword}\" WHERE username = \"{username}\"", conn);
-                }
-                cmd.ExecuteNonQuery();
-                conn.Close();
-            }
-        }
     }
 }

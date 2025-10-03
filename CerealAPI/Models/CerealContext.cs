@@ -740,7 +740,7 @@ namespace CerealAPI.Models
         /// </summary>
         /// <param name="username">the desired username</param>
         /// <param name="password">the desired password</param>
-        private void CreateUser(string username, string password)
+        public void CreateUser(string username, string password)
         {
             string hashedPassword = BCrypt.Net.BCrypt.EnhancedHashPassword(password);
             using (MySqlConnection conn = GetConnection())
