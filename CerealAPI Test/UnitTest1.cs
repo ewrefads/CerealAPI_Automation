@@ -3,16 +3,26 @@ using MySql.Data.MySqlClient;
 
 namespace CerealAPI_Test
 {
+    /// <summary>
+    /// Various tests of the CerealContext class
+    /// </summary>
     public class CerealContextTests
     {
         string connectionString = "server=localhost;port=3306;user=root;password=test";
         CerealContext context;
+        /// <summary>
+        /// Sets up the context variable and sets its database
+        /// </summary>
         [SetUp]
         public void Setup()
         {
             context = new CerealContext(connectionString);
             context.DatabaseName = "testCerealdb";
         }
+
+        /// <summary>
+        /// Checks if the server connection works
+        /// </summary>
         [Test]
         public void ConnectionWorks()
         {
@@ -31,6 +41,9 @@ namespace CerealAPI_Test
             }
         }
 
+        /// <summary>
+        /// Checks if CreateDB creates the database
+        /// </summary>
         [Test]
         public void DatabaseGetsCreated()
         {
@@ -51,6 +64,11 @@ namespace CerealAPI_Test
                 }
             }
         }
+
+        /// <summary>
+        /// Checks if the tables gets created
+        /// </summary>
+        /// <param name="table">The table to check for</param>
         [TestCase("cereal")]
         [TestCase("users")]
         [TestCase("api_log")]
@@ -76,6 +94,11 @@ namespace CerealAPI_Test
             }
         }
 
+        /// <summary>
+        /// Checks if a collumn gets created
+        /// </summary>
+        /// <param name="table">The table containing the collumn</param>
+        /// <param name="collumn">the collumn to check for</param>
         [TestCase("users", "username")]
         [TestCase("users", "psswrd")]
         [TestCase("api_log", "acces_time")]
@@ -121,6 +144,9 @@ namespace CerealAPI_Test
             }
         }
 
+        /// <summary>
+        /// Cleans up after the tests by removing the database
+        /// </summary>
         [TearDown]
         public void TearDown() 
         {
