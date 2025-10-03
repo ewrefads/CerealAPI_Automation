@@ -632,9 +632,9 @@ namespace CerealAPI.Models
                     $"CREATE DATABASE IF NOT EXISTS {db};\r\n" +
                     $"USE {db};\r\n" +
                     "CREATE TABLE IF NOT EXISTS cereal (\r\n\t" +
-                        "id INT UNIQUE,\r\n    " +
-                        "cereal_name VARCHAR(255),\r\n    " +
-                        "mfr CHAR(1),\r\n    " +
+                        "id INT UNIQUE NOT NULL,\r\n    " +
+                        "cereal_name VARCHAR(255) NOT NULL,\r\n    " +
+                        "mfr CHAR(1) NOT NULL,\r\n    " +
                         "cereal_type CHAR(1),\r\n    " +
                         "calories INT,\r\n    " +
                         "protein INT,\r\n    " +

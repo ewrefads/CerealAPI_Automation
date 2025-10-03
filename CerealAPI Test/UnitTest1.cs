@@ -145,6 +145,121 @@ namespace CerealAPI_Test
         }
 
         /// <summary>
+        /// Tests whether the collumns which should not be nullable is actually not nullable
+        /// </summary>
+        /// <param name="table">The table of the collumn</param>
+        /// <param name="collumn">The collumn to be tested</param>
+        [TestCase("users", "username")]
+        [TestCase("users", "psswrd")]
+        [TestCase("cereal", "id")]
+        [TestCase("cereal", "cereal_name")]
+        [TestCase("cereal", "mfr")]
+        public void CollumnIsNotNullable(string table, string collumn)
+        {
+            context.CreateDB(null);
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
+                    enterDatabase.ExecuteNonQuery();
+                    string data = "";
+                    switch(table)
+                    {
+                        case "users":
+                            if(collumn == "username")
+                            {
+                                data = $"(psswrd) VALUES(\"test\")";
+                            }
+                            else
+                            {
+                                data = $"(username) VALUES(\"test\")";
+                            }
+                            break;
+                        case "cereal":
+                            if(collumn == "id")
+                            {
+                                data = $"(cereal_name, mfr) VALUES(\"test\", \"t\")";
+                            }
+                            else if(collumn == "cereal_name")
+                            {
+                                data = $"(id, mfr) VALUES(1, \"t\")";
+                            }
+                            else
+                            {
+                                data = $"(id, cereal_name) VALUES(1, \"test\")";
+                            }
+                            break;
+
+                    }
+                    MySqlCommand InsertIntoTable = new MySqlCommand($"INSERT INTO {table} {data}", conn);
+                    InsertIntoTable.ExecuteNonQuery();
+                    conn.Close();
+                    Assert.IsTrue(false);
+                }
+                catch (MySqlException ex)
+                {
+                    //1364 is the mysql error code for inserting into a table without data in a non nullable field 
+                    Assert.AreEqual(1364, ex.Number);
+                }
+            }
+        }
+        [TestCase("users", "username")]
+        [TestCase("api_log", "acces_time")]
+        [TestCase("api_log", "command")]
+        [TestCase("api_log", "arguments")]
+        [TestCase("api_log", "result")]
+        [TestCase("cereal", "cereal_name")]
+        [TestCase("cereal", "rating")]
+        public void IsString(string table, string collumn)
+        {
+            context.CreateDB(null);
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
+                    enterDatabase.ExecuteNonQuery();
+                    string data = "";
+                    switch (table)
+                    {
+                        case "users":
+                            data = $"VALUES(\"test\", \"test\")";
+                            break;
+                        case "cereal":
+                            if (collumn == "cereal_name")
+                            {
+                                data = $"(id, cereal_name, mfr) VALUES(1, \"test\",\"t\")";
+                            }
+                            else
+                            {
+                                data = $"(id, cereal_name, mfr, {collumn}) VALUES(1, \"test\", \"t\", \"test\")";
+                            }
+                            break;
+                        case "api_log":
+                            data = $"({collumn}) VALUES({collumn})";
+                            break;
+                    }
+                    MySqlCommand InsertIntoTable = new MySqlCommand($"INSERT INTO {table} {data}", conn);
+                    InsertIntoTable.ExecuteNonQuery();
+                    conn.Close();
+                    Assert.IsTrue(true);
+                }
+                catch (MySqlException ex)
+                { 
+                    Assert.AreEqual(int.MinValue, ex.Number);
+                }
+            }
+        }
+
+        public void IsChar(string table, string collumn)
+        {
+
+        }
+
+        /// <summary>
         /// Cleans up after the tests by removing the database
         /// </summary>
         [TearDown]
