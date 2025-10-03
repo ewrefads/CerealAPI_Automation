@@ -27,3 +27,5 @@ For general use
 
 * 1.0
     * Initial Release
+* 1.1
+   * Moved functionallity of Server Configuration to API and removed server configuration 
