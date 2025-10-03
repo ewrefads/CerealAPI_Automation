@@ -254,9 +254,174 @@ namespace CerealAPI_Test
             }
         }
 
+        [TestCase("cereal", "mfr")]
+        [TestCase("cereal", "cereal_type")]
         public void IsChar(string table, string collumn)
         {
+            context.CreateDB(null);
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
+                    enterDatabase.ExecuteNonQuery();
+                    string data = "";
+                    switch (table)
+                    {
+                        case "cereal":
+                            if (collumn == "mfr")
+                            {
+                                data = $"(id, cereal_name, mfr) VALUES(1, \"test\",\"te\")";
+                            }
+                            else
+                            {
+                                data = $"(id, cereal_name, mfr, {collumn}) VALUES(1, \"test\", \"t\", \"te\")";
+                            }
+                            break;
+                        default:
+                            Assert.That(data, Is.SameAs("no collumns on table tested"));
+                            break;
+                    }
+                    MySqlCommand InsertIntoTable = new MySqlCommand($"INSERT INTO {table} {data}", conn);
+                    InsertIntoTable.ExecuteNonQuery();
+                    conn.Close();
+                    Assert.IsTrue(false);
+                }
+                catch (MySqlException ex)
+                {
+                    //1406 is the mysql error code for inserting sometheing which is too long for a collumn
+                    Assert.That(ex.Number, Is.EqualTo(1406));
+                }
+            }
+        }
 
+        [TestCase("cereal", "id")]
+        [TestCase("cereal", "calories")]
+        [TestCase("cereal", "protein")]
+        [TestCase("cereal", "fat")]
+        [TestCase("cereal", "sodium")]
+        [TestCase("cereal", "potass")]
+        [TestCase("cereal", "vitamins")]
+        [TestCase("cereal", "shelf")]
+        public void IsInt(string table, string collumn)
+        {
+            context.CreateDB(null);
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
+                    enterDatabase.ExecuteNonQuery();
+                    string data = "";
+                    switch (table)
+                    {
+                        case "cereal":
+                            if (collumn == "id")
+                            {
+                                data = $"(id, cereal_name, mfr) VALUES(1, \"test\",\"t\")";
+                            }
+                            else
+                            {
+                                data = $"(id, cereal_name, mfr, {collumn}) VALUES(1, \"test\", \"t\", 1)";
+                            }
+                            break;
+                        default:
+                            Assert.That(data, Is.SameAs("no collumns on table tested"));
+                            break;
+                    }
+                    MySqlCommand InsertIntoTable = new MySqlCommand($"INSERT INTO {table} {data}", conn);
+
+                    Assert.That(InsertIntoTable.ExecuteNonQuery(), Is.EqualTo(1));
+                    conn.Close();
+                    
+                }
+                catch (MySqlException ex)
+                {
+                    Assert.That(ex.Number, Is.EqualTo(int.MinValue));
+                }
+            }
+        }
+
+        [TestCase("cereal", "carbo")]
+        [TestCase("cereal", "sugars")]
+        [TestCase("cereal", "weight")]
+        [TestCase("cereal", "cups")]
+        public void IsFloat(string table, string collumn)
+        {
+            context.CreateDB(null);
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
+                    enterDatabase.ExecuteNonQuery();
+                    string data = "";
+                    switch (table)
+                    {
+                        case "cereal":
+                            data = $"(id, cereal_name, mfr, {collumn}) VALUES(1, \"test\", \"t\", 5.55555)";
+                            break;
+                        default:
+                            Assert.That(data, Is.SameAs("no collumns on table tested"));
+                            break;
+                    }
+                    MySqlCommand InsertIntoTable = new MySqlCommand($"INSERT INTO {table} {data}", conn);
+
+                    Assert.That(InsertIntoTable.ExecuteNonQuery(), Is.EqualTo(1));
+                    conn.Close();
+
+                }
+                catch (MySqlException ex)
+                {
+                    Assert.That(ex.Number, Is.EqualTo(int.MinValue));
+                }
+            }
+        }
+
+        [TestCase("cereal", "id")]
+        public void IsUnique(string table, string collumn)
+        {
+            context.CreateDB(null);
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
+                    enterDatabase.ExecuteNonQuery();
+                    string data = "";
+                    string data1 = ""; 
+                    switch (table)
+                    {
+                        case "cereal":
+                            if(collumn == "id")
+                            {
+                                data = $"(id, cereal_name, mfr) VALUES(1, \"test\", \"t\")";
+                            }
+                            //data = $"(id, cereal_name, mfr, {collumn}) VALUES(1, \"test\", \"t\", \"t\")";
+                            break;
+                        default:
+                            Assert.That(data, Is.SameAs("no collumns on table tested"));
+                            break;
+                    }
+                    MySqlCommand InsertIntoTable = new MySqlCommand($"INSERT INTO {table} {data}", conn);
+                    InsertIntoTable.ExecuteNonQuery();
+                    MySqlCommand InsertIntoTable1 = new MySqlCommand($"INSERT INTO {table} {data}", conn);
+                    InsertIntoTable1.ExecuteNonQuery();
+                    Assert.That(InsertIntoTable1.ExecuteNonQuery(), Is.EqualTo(2));
+
+                    conn.Close();
+
+                }
+                catch (MySqlException ex)
+                {
+                    //1062 is the mysql error code for duplicate values in a unqiue collumn
+                    Assert.That(ex.Number, Is.EqualTo(1062));
+                }
+            }
         }
 
         /// <summary>
