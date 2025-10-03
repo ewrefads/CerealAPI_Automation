@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CerealAPI\CerealAPI.csproj" />
-    <ProjectReference Include="..\Server Configuration\Server Configuration.csproj" />
   </ItemGroup>
 
   <ItemGroup>

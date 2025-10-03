@@ -817,5 +817,42 @@ namespace CerealAPI.Models
                 cmd.ExecuteNonQuery();
             }
         }
+
+        /// <summary>
+        /// Returns all data from the api_logs table
+        /// </summary>
+        /// <returns>a list of all logs</returns>
+        public List<string> Logs()
+        {
+            List<string> logs = new List<string>();
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM api_log", conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    string log = $"{reader.GetString("acces_time")} {reader.GetString("command")}({reader.GetString("arguments")}), {reader.GetString("result")}";
+                    logs.Add(log);
+                }
+            }
+            return logs;
+        }
+
+        /// <summary>
+        /// Checks whether the database allready has a user with the given username
+        /// </summary>
+        /// <param name="username">the username to be checked</param>
+        /// <returns>Whether the username is in the database</returns>
+        public bool ContainsUser(string username)
+        {
+            using (MySqlConnection conn = GetConnection()) 
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand($"SELECT * FROM users WHERE username = \"{username}\"", conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                return reader.HasRows;
+            }
+        }
     }
 }

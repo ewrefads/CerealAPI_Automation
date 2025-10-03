@@ -63,15 +63,18 @@ namespace CerealAPI.Controllers
         {
             if(!Path.Exists(Path.Combine(env.WebRootPath, Path.Combine(location, name))))
             {
+                cerealContext.LogAPICall(DateTime.Now.ToString(), "InsertFromCSV", $"{location}, {name}", "404:Not Found");
                 return NotFound("File not found");
             }
             if(!name.Contains(".CSV"))
             {
+                cerealContext.LogAPICall(DateTime.Now.ToString(), "InsertFromCSV", $"{location}, {name}", "400:Bad Request");
                 return BadRequest("File must be a CSV file");
             }
             if(cerealContext.VerifyUser(username, password))
             {
                 cerealContext.InsertFromCSV(Path.Combine(env.WebRootPath, location), name);
+                cerealContext.LogAPICall(DateTime.Now.ToString(), "InsertFromCSV", $"{location}, {name}", "200:Ok");
                 return Ok("File contents was inserted");
             }
             return BadRequest("Invalid username or password");
