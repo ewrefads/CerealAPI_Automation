@@ -49,7 +49,17 @@ To communicate with the database it uses the CerealContext class. It has the fol
 ## Getting Started
 
 ### Dependencies
-
+* BCrypt.Net-NExt
+* coverlet.collector
+* Csv
+* Microsoft.NET.Test.Sdk
+* Microsoft.VisualSTudio.Web.CodeGeneration.Design
+* MySql.Data
+* NUnit
+* NUnit.Analyzers
+* Nunit3TestAdapter
+* Pomelo.EntityFrameworkCore.MySql
+* Swashbuckle.AspNetCore
 * For testing the program should be run through visual studio(2022 was used in the development)
 
 ### Installing
@@ -65,7 +75,7 @@ For testing do the following
 * A swagger window should open in which the various API calls can be triggered.
 
 For general use
-* TODO
+* Start the CerealAPI.exe file
 
 ## Version History
 
