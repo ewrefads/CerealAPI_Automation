@@ -16,7 +16,7 @@ namespace ServerConfiguration
     {
         
         /// <summary>
-        /// Sets up the server if it has not been done yet. Afterwards it takes commands to update and add users and insert new data from CSV files
+        /// Sets up the server if it has not been done yet. Afterwards it takes commands to update and add users
         /// </summary>
         public static void Main()
         {
@@ -38,30 +38,9 @@ namespace ServerConfiguration
                     case ("quit"):
                         active = false;
                         break;
-                    //Parses a given CSV file
-                    case ("parse"):
-                        bool valid = true;
-                        //Checks if the amount of arguments was correct
-                        if(words.Length != 2)
-                        {
-                            valid = false;
-                            Console.WriteLine("wrong number of arguments");
-                        }
-                        //Checks if the file exists
-                        if(valid && !File.Exists(words[1]))
-                        {
-                            Console.WriteLine("Could not locate file");
-                            valid = false;
-                        }
-                        //Parses the files
-                        if(valid)
-                        {
-                            InsertFromCSV(words[1], cerealContext);
-                        }
-                        break;
                     //Adds or updates the password of a user
                     case ("user"):
-                        valid = true;
+                        bool valid = true;
                         //Checks if the amount of arguments was correct
                         if(words.Length != 3)
                         {
@@ -111,7 +90,6 @@ namespace ServerConfiguration
                         break;
                     //Prints a list of commands and a description
                     case ("help"):
-                        Console.WriteLine("parse [filename.csv]       | Parses data from a given csv file into the cereal table");
                         Console.WriteLine("user [username] [password] | Creates a new user or updates an existing users password");
                         Console.WriteLine("help                       | Prints a list of commands and their arguments");
                         Console.WriteLine("quit                       | Closes the program.");
@@ -155,49 +133,5 @@ namespace ServerConfiguration
             Console.WriteLine();
             return password;
         }
-
-        /// <summary>
-        /// Inserts data into the database from a given CSV file
-        /// </summary>
-        /// <param name="filepath">The location of the CSV file</param>
-        /// <exception cref="Exception">An Exception is thrown if there was any issues with the file</exception>
-        public static void InsertFromCSV(string filepath, CerealContext cerealContext)
-        {
-            try
-            {
-                var csv = File.ReadAllText(filepath);
-                foreach (var line in CsvReader.ReadFromText(csv))
-                {
-                    if (line[0].Length > 0)
-                    {
-                        Cereal cereal = new Cereal();
-                        cereal.Name = line[0];
-                        cereal.MFR = line[1][0];
-                        cereal.Type = line[2][0];
-                        cereal.Calories = int.Parse(line[3]);
-                        cereal.Protein = int.Parse(line[4]);
-                        cereal.Fat = int.Parse(line[5]);
-                        cereal.Sodium = int.Parse(line[6]);
-                        cereal.Fiber = float.Parse(line[7]);
-                        cereal.Carbo = float.Parse(line[8]);
-                        cereal.Sugars = int.Parse(line[9]);
-                        cereal.Potass = int.Parse(line[10]);
-                        cereal.Vitamins = int.Parse(line[11]);
-                        cereal.Shelf = int.Parse(line[12]);
-                        cereal.Weight = float.Parse(line[13]);
-                        cereal.Cups = float.Parse(line[14]);
-                        cereal.Rating = line[15];
-                        cerealContext.AddCereal(cereal);
-                    }
-                }
-            }
-            catch (IOException e)
-            {
-                Console.WriteLine(e.ToString());
-                throw new Exception("File could not be loaded");
-            }
-
-        }
-
     }
 }

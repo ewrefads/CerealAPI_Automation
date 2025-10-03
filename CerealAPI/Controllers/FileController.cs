@@ -50,5 +50,32 @@ namespace CerealAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Inserts data from a given CSV file located in the wwwroot folder of the server
+        /// </summary>
+        /// <param name="location">Which folder the file is located in</param>
+        /// <param name="name">the name of the file. Must contain the .CSV extension</param>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns>Whether the input was correct</returns>
+        [HttpPost(Name = "InsertFromCSV")]
+        public IActionResult InsertFromCSV(string location, string name, string username, string password)
+        {
+            if(!Path.Exists(Path.Combine(env.WebRootPath, Path.Combine(location, name))))
+            {
+                return NotFound("File not found");
+            }
+            if(!name.Contains(".CSV"))
+            {
+                return BadRequest("File must be a CSV file");
+            }
+            if(cerealContext.VerifyUser(username, password))
+            {
+                cerealContext.InsertFromCSV(Path.Combine(env.WebRootPath, location), name);
+                return Ok("File contents was inserted");
+            }
+            return BadRequest("Invalid username or password");
+        }
+
     }
 }
