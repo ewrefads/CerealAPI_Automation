@@ -89,12 +89,10 @@
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Csv" Version="2.0.170" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.3.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageReference Include="MySql.Data" Version="9.4.0" />
-    <PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.6" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.5" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
   </ItemGroup>
 
   <ItemGroup>
