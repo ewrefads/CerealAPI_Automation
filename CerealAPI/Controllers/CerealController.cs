@@ -19,10 +19,10 @@ namespace CerealAPI.Controllers
         private readonly ILogger<CerealController> _logger;
         
 
-        public CerealController(ILogger<CerealController> logger)
+        public CerealController(ILogger<CerealController> logger, IConfiguration configuration)
         {
             _logger = logger;
-            cerealContext = new CerealContext("server=localhost;port=3306;database=cerealdb;user=root;password=test");
+            cerealContext = new CerealContext(configuration.GetConnectionString("DefaultConnection"));
             
         }
 

@@ -20,6 +20,7 @@ namespace CerealAPI.Models
     {
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
+        public string tablePrefix = "";
         public CerealContext(string connectionString)
         {
             ConnectionString = connectionString;
@@ -34,7 +35,8 @@ namespace CerealAPI.Models
             //Used for testing. Sets the database to the given one
             if(DatabaseName != null && DatabaseName != "")
             {
-                ConnectionString = $"server=localhost;port=3306;database={DatabaseName};user=root;password=test";
+                ConnectionString = $"server=db;port=3306;database={DatabaseName};user=root;password=test";
+                ConnectionString = $"server=db;port=3306;database={DatabaseName};user=root;password=test";
                 DatabaseName = "";
             }
             return new MySqlConnection(ConnectionString);
@@ -90,6 +92,7 @@ namespace CerealAPI.Models
                         });
                     }
                 }
+                conn.Close();
             }
             return list;
         }
@@ -300,7 +303,7 @@ namespace CerealAPI.Models
                     }
                 }
                 //Executes the command and creates the list
-                MySqlCommand cmd = new MySqlCommand($"SELECT * FROM cereal WHERE {filter}", conn);
+                MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {tablePrefix}cereal WHERE {filter}", conn);
                 using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -377,7 +380,7 @@ namespace CerealAPI.Models
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand($"SELECT id FROM cereal ORDER BY id DESC LIMIT 1", conn);
+                MySqlCommand cmd = new MySqlCommand($"SELECT id FROM {tablePrefix}cereal ORDER BY id DESC LIMIT 1", conn);
                 using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
                     int id = 0;
@@ -389,9 +392,14 @@ namespace CerealAPI.Models
                         }
                     }
                     reader.Close();
-                    MySqlCommand insertCmd = new MySqlCommand($"INSERT INTO cereal VALUES({id}, \"{cereal.Name}\", \"{cereal.MFR.ToString()}\", \"{cereal.Type.ToString()}\", {cereal.Calories}, {cereal.Protein}, {cereal.Fat}, {cereal.Sodium}, {cereal.Fiber}, {cereal.Carbo}, {cereal.Sugars}, {cereal.Potass}, {cereal.Vitamins}, {cereal.Shelf}, {cereal.Weight}, {cereal.Cups}, \"{cereal.Rating}\")", conn);
-                    insertCmd.ExecuteNonQuery();
+                    MySqlCommand insertCmd = new MySqlCommand($"INSERT INTO {tablePrefix}cereal VALUES({id}, \"{cereal.Name}\", \"{cereal.MFR.ToString()}\", \"{cereal.Type.ToString()}\", {cereal.Calories}, {cereal.Protein}, {cereal.Fat}, {cereal.Sodium}, {cereal.Fiber}, {cereal.Carbo}, {cereal.Sugars}, {cereal.Potass}, {cereal.Vitamins}, {cereal.Shelf}, {cereal.Weight}, {cereal.Cups}, \"{cereal.Rating}\")", conn);
+                    int res = insertCmd.ExecuteNonQuery();
+                    if(res != 1)
+                    {
+                        throw new Exception("error on inserting cereal");
+                    }
                 }
+                conn.Close();
             }
         }
 
@@ -535,7 +543,7 @@ namespace CerealAPI.Models
                 //Updates the cereal based on the values which varied from the database
                 if (updateValues.Length > 0)
                 {
-                    MySqlCommand updateCommand = new MySqlCommand($"UPDATE cereal SET {updateValues} WHERE id = {cereal.Id}", conn);
+                    MySqlCommand updateCommand = new MySqlCommand($"UPDATE {tablePrefix}cereal SET {updateValues} WHERE id = {cereal.Id}", conn);
                     updateCommand.ExecuteNonQuery();
                 }
                 return GetCereal(cereal.Id);
@@ -552,7 +560,7 @@ namespace CerealAPI.Models
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
-                MySqlCommand selectCommand = new MySqlCommand($"SELECT * FROM cereal WHERE id = {id}", conn);
+                MySqlCommand selectCommand = new MySqlCommand($"SELECT * FROM {tablePrefix}cereal WHERE id = {id}", conn);
                 MySqlDataReader selectReader = selectCommand.ExecuteReader();
                 if (selectReader.HasRows)
                 {
@@ -619,75 +627,77 @@ namespace CerealAPI.Models
         /// <param name="env">The webhost environment of the server</param>
         public void CreateDB(IWebHostEnvironment env)
         {
-            using (MySqlConnection conn = new MySqlConnection("server=localhost;port=3306;user=root;password=test"))
+
+            try
             {
-                conn.Open();
-                string db = "cerealdb";
-                if(DatabaseName != null)
+                using (MySqlConnection conn = GetConnection())
                 {
-                    db = DatabaseName;
-                }
-                //Creates the database and the various tables
-                MySqlCommand cmd = new MySqlCommand(
-                    $"CREATE DATABASE IF NOT EXISTS {db};\r\n" +
-                    $"USE {db};\r\n" +
-                    "CREATE TABLE IF NOT EXISTS cereal (\r\n\t" +
-                        "id INT UNIQUE NOT NULL,\r\n    " +
-                        "cereal_name VARCHAR(255) NOT NULL,\r\n    " +
-                        "mfr CHAR(1) NOT NULL,\r\n    " +
-                        "cereal_type CHAR(1),\r\n    " +
-                        "calories INT,\r\n    " +
-                        "protein INT,\r\n    " +
-                        "fat INT,\r\n    " +
-                        "sodium INT,\r\n    " +
-                        "fiber FLOAT,\r\n    " +
-                        "carbo FLOAT,\r\n    " +
-                        "sugars INT,\r\n    " +
-                        "potass INT,\r\n    " +
-                        "vitamins INT,\r\n    " +
-                        "shelf INT,\r\n    " +
-                        "weight FLOAT,\r\n    " +
-                        "cups FLOAT,\r\n    " +
-                        "rating VARCHAR(255),\r\n    " +
-                        "UNIQUE KEY unique_name_mfr(cereal_name, mfr)\r\n" +
-                    ");" +
-                    "CREATE TABLE IF NOT EXISTS users (\r\n\t" +
-                        "username VARCHAR(255) UNIQUE NOT NULL,\r\n    " +
-                        "psswrd VARCHAR(255) NOT NULL\r\n);\r\n\r\n" +
-                    "CREATE TABLE IF NOT EXISTS api_log (\r\n\t" +
-                        "acces_time VARCHAR(255),\r\n    " +
-                        "command VARCHAR(255),\r\n    " +
-                        "arguments VARCHAR(255),\r\n    " +
-                        "result VARCHAR(255)\r\n" +
-                    ")"
-                    , conn);
-                cmd.ExecuteNonQuery();
-                cmd = new MySqlCommand("SELECT * FROM users", conn);
-                MySqlDataReader reader = cmd.ExecuteReader();
-                //Creates the initial admin user if it does not exists
-                if (!reader.HasRows)
-                {
-                    reader.Close();
-                    CreateUser("admin", "test");
-                }
-                else
-                {
-                    reader.Close();
-                }
+                    conn.Open();
+                    //Creates the database and the various tables
+                    MySqlCommand cmd = new MySqlCommand(
+                        $"CREATE TABLE IF NOT EXISTS {tablePrefix}cereal (\r\n\t" +
+                            "id INT UNIQUE NOT NULL,\r\n    " +
+                            "cereal_name VARCHAR(255) NOT NULL,\r\n    " +
+                            "mfr CHAR(1) NOT NULL,\r\n    " +
+                            "cereal_type CHAR(1),\r\n    " +
+                            "calories INT,\r\n    " +
+                            "protein INT,\r\n    " +
+                            "fat INT,\r\n    " +
+                            "sodium INT,\r\n    " +
+                            "fiber FLOAT,\r\n    " +
+                            "carbo FLOAT,\r\n    " +
+                            "sugars INT,\r\n    " +
+                            "potass INT,\r\n    " +
+                            "vitamins INT,\r\n    " +
+                            "shelf INT,\r\n    " +
+                            "weight FLOAT,\r\n    " +
+                            "cups FLOAT,\r\n    " +
+                            "rating VARCHAR(255),\r\n    " +
+                            "UNIQUE KEY unique_name_mfr(cereal_name, mfr)\r\n" +
+                        ");" +
+                        $"CREATE TABLE IF NOT EXISTS {tablePrefix}users (\r\n\t" +
+                            "username VARCHAR(255) UNIQUE NOT NULL,\r\n    " +
+                            "psswrd VARCHAR(255) NOT NULL\r\n);\r\n\r\n" +
+                        $"CREATE TABLE IF NOT EXISTS {tablePrefix}api_log (\r\n\t" +
+                            "acces_time VARCHAR(255),\r\n    " +
+                            "command VARCHAR(255),\r\n    " +
+                            "arguments VARCHAR(255),\r\n    " +
+                            "result VARCHAR(255)\r\n" +
+                        ")"
+                        , conn);
+                    int res = cmd.ExecuteNonQuery();
+                    cmd = new MySqlCommand($"SELECT * FROM {tablePrefix}users", conn);
+                    MySqlDataReader reader = cmd.ExecuteReader();
+                    //Creates the initial admin user if it does not exists
+                    if (!reader.HasRows)
+                    {
+                        reader.Close();
+                        CreateUser("admin", "test");
+                    }
+                    else
+                    {
+                        reader.Close();
+                    }
 
-                MySqlCommand contentCheck = new MySqlCommand("SELECT * FROM cereal", conn);
-                MySqlDataReader contentReader = contentCheck.ExecuteReader();
+                    MySqlCommand contentCheck = new MySqlCommand($"SELECT * FROM {tablePrefix}cereal", conn);
+                    MySqlDataReader contentReader = contentCheck.ExecuteReader();
 
-                bool hasRows = contentReader.HasRows;
-                conn.Close();
-                //Inserts data into the cereal table if it has not been populated yet
-                if (!hasRows && env != null)
-                {
-                    Console.WriteLine("loading data");
-                    string path = Path.Combine(env.WebRootPath, "Data");
-                    InsertFromCSV(path, "Cereal.csv");
+                    bool hasRows = contentReader.HasRows;
+                    conn.Close();
+                    //Inserts data into the cereal table if it has not been populated yet
+                    if (!hasRows && env != null)
+                    {
+                        Console.WriteLine("loading data");
+                        string path = Path.Combine(env.WebRootPath, "Data");
+                        InsertFromCSV(path, "Cereal.csv");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
         }
 
         /// <summary>
@@ -747,7 +757,7 @@ namespace CerealAPI.Models
             {
                 //Checks whether the user is allready in the database
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand($"SELECT * FROM users WHERE username = \"{username}\"", conn);
+                MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {tablePrefix}users WHERE username = \"{username}\"", conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
                 bool contains = reader.HasRows;
                 reader.Close();
@@ -756,13 +766,17 @@ namespace CerealAPI.Models
                 //Adds the user to the database or updates their password if they allready exists
                 if (!contains)
                 {
-                    cmd = new MySqlCommand($"INSERT INTO users VALUES(\"{username}\", \"{hashedPassword}\")", conn);
+                    cmd = new MySqlCommand($"INSERT INTO {tablePrefix}users VALUES(\"{username}\", \"{hashedPassword}\")", conn);
                 }
                 else
                 {
-                    cmd = new MySqlCommand($"UPDATE users SET psswrd = \"{hashedPassword}\" WHERE username = \"{username}\"", conn);
+                    cmd = new MySqlCommand($"UPDATE {tablePrefix}users SET psswrd = \"{hashedPassword}\" WHERE username = \"{username}\"", conn);
                 }
-                cmd.ExecuteNonQuery();
+                int res = cmd.ExecuteNonQuery();
+                if(res != 1)
+                {
+                    throw new Exception("No user was created");
+                }
                 conn.Close();
             }
         }
@@ -779,7 +793,7 @@ namespace CerealAPI.Models
             {
                 conn.Open();
                 bool res = false;
-                MySqlCommand cmd = new MySqlCommand($"SELECT psswrd FROM users WHERE username = \"{username}\"", conn);
+                MySqlCommand cmd = new MySqlCommand($"SELECT psswrd FROM {tablePrefix}users WHERE username = \"{username}\"", conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
                 if(reader.HasRows)
                 {
@@ -813,8 +827,9 @@ namespace CerealAPI.Models
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand($"INSERT INTO api_log VALUES(\"{timestamp}\", \"{method}\", \"{arguments}\", \"{result}\")", conn);
+                MySqlCommand cmd = new MySqlCommand($"INSERT INTO {tablePrefix}api_log VALUES(\"{timestamp}\", \"{method}\", \"{arguments}\", \"{result}\")", conn);
                 cmd.ExecuteNonQuery();
+                conn.Close();
             }
         }
 
@@ -828,7 +843,7 @@ namespace CerealAPI.Models
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT * FROM api_log", conn);
+                MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {tablePrefix}api_log", conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -849,7 +864,7 @@ namespace CerealAPI.Models
             using (MySqlConnection conn = GetConnection()) 
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand($"SELECT * FROM users WHERE username = \"{username}\"", conn);
+                MySqlCommand cmd = new MySqlCommand($"SELECT * FROM {tablePrefix}users WHERE username = \"{username}\"", conn);
                 MySqlDataReader reader = cmd.ExecuteReader();
                 return reader.HasRows;
             }

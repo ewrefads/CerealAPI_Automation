@@ -1,6 +1,6 @@
 using CerealAPI.Models;
 using MySql.Data.MySqlClient;
-
+using NUnit;
 namespace CerealAPI_Test
 {
     /// <summary>
@@ -8,7 +8,8 @@ namespace CerealAPI_Test
     /// </summary>
     public class CerealContextTests
     {
-        string connectionString = "server=localhost;port=3306;user=root;password=test";
+        
+        string connectionString = "server=db;port=3306;database=cerealdb;user=root;password=test";
         CerealContext context;
         /// <summary>
         /// Sets up the context variable and sets its database
@@ -17,7 +18,7 @@ namespace CerealAPI_Test
         public void Setup()
         {
             context = new CerealContext(connectionString);
-            context.DatabaseName = "testCerealdb";
+            context.tablePrefix = "test";
         }
 
         /// <summary>
@@ -32,38 +33,15 @@ namespace CerealAPI_Test
                 {
                     conn.Open();
                     conn.Close();
-                    Assert.IsTrue(true);
+                    Assert.That(true);
                 }
                 catch (MySqlException ex)
                 {
-                    Assert.AreEqual(int.MinValue, ex.Number);
+                    Assert.That(int.MinValue == ex.Number);
                 }
             }
         }
 
-        /// <summary>
-        /// Checks if CreateDB creates the database
-        /// </summary>
-        [Test]
-        public void DatabaseGetsCreated()
-        {
-            context.CreateDB(null);
-            using (MySqlConnection conn = new MySqlConnection(connectionString))
-            {
-                try
-                {
-                    conn.Open();
-                    MySqlCommand checkIfDatabaseGetsCreated = new MySqlCommand("USE testCerealdb", conn);
-                    checkIfDatabaseGetsCreated.ExecuteNonQuery();
-                    conn.Close();
-                    Assert.IsTrue(true);
-                }
-                catch (MySqlException ex)
-                {
-                    Assert.AreEqual(int.MinValue, ex.Number);
-                }
-            }
-        }
 
         /// <summary>
         /// Checks if the tables gets created
@@ -74,25 +52,30 @@ namespace CerealAPI_Test
         [TestCase("api_log")]
         public void TableGetsCreated(string table)
         {
+            table = "test" + table;
             context.CreateDB(null);
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
-                    enterDatabase.ExecuteNonQuery();
                     MySqlCommand selectFromTable = new MySqlCommand($"SELECT * FROM {table}", conn);
                     selectFromTable.ExecuteNonQuery();
                     conn.Close();
-                    Assert.IsTrue(true);
+                    Assert.That(true);
                 }
                 catch (MySqlException ex)
                 {
-                    Assert.AreEqual(int.MinValue, ex.Number);
+                    Assert.That(int.MinValue == ex.Number);
                 }
             }
         }
+
+        /*[Test]
+        public void FailingTest()
+        {
+            Assert.That(true == false);
+        }*/
 
         /// <summary>
         /// Checks if a collumn gets created
@@ -124,22 +107,21 @@ namespace CerealAPI_Test
         [TestCase("cereal", "rating")]
         public void ColumnGetsCreated(string table, string collumn)
         {
+            table = "test" + table;
             context.CreateDB(null);
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
-                    enterDatabase.ExecuteNonQuery();
                     MySqlCommand selectFromTable = new MySqlCommand($"SELECT {collumn} FROM {table}", conn);
                     selectFromTable.ExecuteNonQuery();
                     conn.Close();
-                    Assert.IsTrue(true);
+                    Assert.That(true);
                 }
                 catch (MySqlException ex)
                 {
-                    Assert.AreEqual(int.MinValue, ex.Number);
+                    Assert.That(int.MinValue == ex.Number);
                 }
             }
         }
@@ -157,15 +139,14 @@ namespace CerealAPI_Test
         public void CollumnIsNotNullable(string table, string collumn)
         {
             context.CreateDB(null);
+            table = "test" + table;
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
-                    enterDatabase.ExecuteNonQuery();
                     string data = "";
-                    switch(table)
+                    switch (table.Split("test")[1])
                     {
                         case "users":
                             if(collumn == "username")
@@ -196,12 +177,12 @@ namespace CerealAPI_Test
                     MySqlCommand InsertIntoTable = new MySqlCommand($"INSERT INTO {table} {data}", conn);
                     InsertIntoTable.ExecuteNonQuery();
                     conn.Close();
-                    Assert.IsTrue(false);
+                    Assert.That(false);
                 }
                 catch (MySqlException ex)
                 {
                     //1364 is the mysql error code for inserting into a table without data in a non nullable field 
-                    Assert.AreEqual(1364, ex.Number);
+                    Assert.That(1364 == ex.Number);
                 }
             }
         }
@@ -215,15 +196,14 @@ namespace CerealAPI_Test
         public void IsString(string table, string collumn)
         {
             context.CreateDB(null);
+            table = "test" + table;
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
-                    enterDatabase.ExecuteNonQuery();
                     string data = "";
-                    switch (table)
+                    switch (table.Split("test")[1])
                     {
                         case "users":
                             data = $"VALUES(\"test\", \"test\")";
@@ -245,11 +225,11 @@ namespace CerealAPI_Test
                     MySqlCommand InsertIntoTable = new MySqlCommand($"INSERT INTO {table} {data}", conn);
                     InsertIntoTable.ExecuteNonQuery();
                     conn.Close();
-                    Assert.IsTrue(true);
+                    Assert.That(true);
                 }
                 catch (MySqlException ex)
                 { 
-                    Assert.AreEqual(int.MinValue, ex.Number);
+                    Assert.That(int.MinValue == ex.Number);
                 }
             }
         }
@@ -259,15 +239,14 @@ namespace CerealAPI_Test
         public void IsChar(string table, string collumn)
         {
             context.CreateDB(null);
+            table = "test" + table;
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
-                    enterDatabase.ExecuteNonQuery();
                     string data = "";
-                    switch (table)
+                    switch (table.Split("test")[1])
                     {
                         case "cereal":
                             if (collumn == "mfr")
@@ -286,7 +265,7 @@ namespace CerealAPI_Test
                     MySqlCommand InsertIntoTable = new MySqlCommand($"INSERT INTO {table} {data}", conn);
                     InsertIntoTable.ExecuteNonQuery();
                     conn.Close();
-                    Assert.IsTrue(false);
+                    Assert.That(false);
                 }
                 catch (MySqlException ex)
                 {
@@ -307,15 +286,14 @@ namespace CerealAPI_Test
         public void IsInt(string table, string collumn)
         {
             context.CreateDB(null);
+            table = "test" + table;
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
-                    enterDatabase.ExecuteNonQuery();
                     string data = "";
-                    switch (table)
+                    switch (table.Split("test")[1])
                     {
                         case "cereal":
                             if (collumn == "id")
@@ -351,15 +329,14 @@ namespace CerealAPI_Test
         public void IsFloat(string table, string collumn)
         {
             context.CreateDB(null);
+            table = "test" + table;
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
-                    enterDatabase.ExecuteNonQuery();
                     string data = "";
-                    switch (table)
+                    switch (table.Split("test")[1])
                     {
                         case "cereal":
                             data = $"(id, cereal_name, mfr, {collumn}) VALUES(1, \"test\", \"t\", 5.55555)";
@@ -385,16 +362,15 @@ namespace CerealAPI_Test
         public void IsUnique(string table, string collumn)
         {
             context.CreateDB(null);
+            table = "test" + table;
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-                    MySqlCommand enterDatabase = new MySqlCommand("USE testCerealdb", conn);
-                    enterDatabase.ExecuteNonQuery();
                     string data = "";
-                    string data1 = ""; 
-                    switch (table)
+                    string data1 = "";
+                    switch (table.Split("test")[1])
                     {
                         case "cereal":
                             if(collumn == "id")
@@ -412,7 +388,7 @@ namespace CerealAPI_Test
                     MySqlCommand InsertIntoTable1 = new MySqlCommand($"INSERT INTO {table} {data}", conn);
                     InsertIntoTable1.ExecuteNonQuery();
                     Assert.That(InsertIntoTable1.ExecuteNonQuery(), Is.EqualTo(2));
-
+                    InsertIntoTable1.ExecuteNonQuery();
                     conn.Close();
 
                 }
@@ -433,7 +409,11 @@ namespace CerealAPI_Test
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                MySqlCommand cleanUp = new MySqlCommand("DROP DATABASE IF EXISTS testCerealdb", conn);
+                MySqlCommand cleanUp = new MySqlCommand("DROP TABLE IF EXISTS testcereal;", conn);
+                cleanUp.ExecuteNonQuery();
+                cleanUp = new MySqlCommand("DROP TABLE IF EXISTS testusers;", conn);
+                cleanUp.ExecuteNonQuery();
+                cleanUp = new MySqlCommand("DROP TABLE IF EXISTS testapi_logs;", conn);
                 cleanUp.ExecuteNonQuery();
                 conn.Close();
             }

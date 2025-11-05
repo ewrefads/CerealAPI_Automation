@@ -18,10 +18,10 @@ namespace CerealAPI.Controllers
         private readonly ILogger<FileController> _logger;
 
 
-        public FileController(ILogger<FileController> logger, IWebHostEnvironment env)
+        public FileController(ILogger<FileController> logger, IWebHostEnvironment env, IConfiguration configuration)
         {
             _logger = logger;
-            cerealContext = new CerealContext("server=localhost;port=3306;database=cerealdb;user=root;password=test");
+            cerealContext = new CerealContext(configuration.GetConnectionString("DefaultConnection"));
             this.env = env;
             filepath = Path.Combine(env.WebRootPath, "Cereal Pictures");
         }

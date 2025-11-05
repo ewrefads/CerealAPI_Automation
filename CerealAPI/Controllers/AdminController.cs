@@ -16,10 +16,10 @@ namespace CerealAPI.Controllers
         private readonly ILogger<AdminController> _logger;
 
 
-        public AdminController(ILogger<AdminController> logger)
+        public AdminController(ILogger<AdminController> logger, IConfiguration configuration)
         {
             _logger = logger;
-            cerealContext = new CerealContext("server=localhost;port=3306;database=cerealdb;user=root;password=test");
+            cerealContext = new CerealContext(configuration.GetConnectionString("DefaultConnection"));
 
         }
 
