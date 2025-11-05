@@ -18,9 +18,9 @@ services:
     build:
       context: .
       dockerfile: CerealAPITest/Dockerfile
-    # depends_on:
-    #    db:
-    #     condition: service_healthy
+    depends_on:
+       db:
+        condition: service_healthy
     restart: always
     ports:
         - 8081:8081 
