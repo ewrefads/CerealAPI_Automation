@@ -19,8 +19,10 @@ WORKDIR "/src/CerealAPI"
 RUN dotnet build "./CerealAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 
-# Run the tests
-HEALTHCHECK --timeout=20s --retries=3 CMD dotnet test bin/Debug/net8.0/CerealAPITest.dll --no-build --verbosity normal
+# This stage is used to publish the service project to be copied to the final stage
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./CerealAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
