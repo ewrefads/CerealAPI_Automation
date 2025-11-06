@@ -18,7 +18,7 @@
 
                 steps {
 
-                    dir('CerealAPI') {
+                    dir('./') {
 
                         // Check the docker-compose version
 
