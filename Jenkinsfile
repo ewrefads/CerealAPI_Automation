@@ -17,18 +17,22 @@
             stage('Build and Test') {
 
                 steps {
+                    def workspace = WORKSPACE
 
-                    // Check the docker-compose version
+                    dir(workspace + '/CerealAPI') {
 
-                    sh 'docker-compose --version'
+                        // Check the docker-compose version
 
-                    // Bring up the services
+                        sh 'docker-compose --version'
 
-                    sh 'docker-compose up -d'
+                        // Bring up the services
 
-                    // Ensure the services are running
+                        sh 'docker-compose up -d'
 
-                    sh 'docker-compose ps'
+                        // Ensure the services are running
+
+                        sh 'docker-compose ps'
+                    }
 
                 }
 
