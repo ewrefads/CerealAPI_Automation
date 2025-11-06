@@ -4,7 +4,8 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "cerealapi": "StartDebugging"
+        "cerealapi": "StartDebugging",
+        "cerealapitest": "StartDebugging"
       }
     }
   }
