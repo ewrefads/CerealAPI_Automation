@@ -358,6 +358,12 @@ namespace CerealAPI_Test
             }
         }
 
+        [Test]
+        public void TestSystemTest()
+        {
+            Assert.That(true);
+        }
+
         [TestCase("cereal", "id")]
         public void IsUnique(string table, string collumn)
         {
