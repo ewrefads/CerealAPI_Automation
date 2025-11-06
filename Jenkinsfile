@@ -22,15 +22,15 @@
 
                         // Check the docker-compose version
 
-                        sh 'docker-compose --version'
+                        powershell 'docker-compose --version'
 
                         // Bring up the services
 
-                        sh 'docker-compose  -f "docker-compose.yml" -f "docker-compose.override.yml" -f "docker-compose.overideextra.yml" --ansi never up -d'
+                        powershell 'docker-compose  -f "docker-compose.yml" -f "docker-compose.override.yml" -f "docker-compose.overideextra.yml" --ansi never up -d'
 
                         // Ensure the services are running
 
-                        sh 'docker-compose ps'
+                        powershell 'docker-compose ps'
                     }
 
                 }
