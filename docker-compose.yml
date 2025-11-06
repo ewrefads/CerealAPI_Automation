@@ -36,10 +36,6 @@ services:
         ConnectionStrings__DefaultConnection: "server=db;port=3306;database=cerealdb;user=root;password=test"
     ports:
         - 8083:8080 
-  
-
-
-
 volumes:
   mysql_data:
 
