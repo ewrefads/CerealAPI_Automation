@@ -2,7 +2,7 @@
 
         agent any
         triggers {
-          triggers{ pollSCM('H/15 * * * *') }
+          pollSCM('H/15 * * * *')
         }
         stages {
 
