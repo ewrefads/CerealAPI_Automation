@@ -17,9 +17,8 @@
             stage('Build and Test') {
 
                 steps {
-                    def workspace = WORKSPACE
 
-                    dir(workspace + '/CerealAPI') {
+                    dir(${context.WORKSPACE} + '/CerealAPI') {
 
                         // Check the docker-compose version
 
