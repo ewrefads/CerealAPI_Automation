@@ -18,7 +18,7 @@
 
                 steps {
 
-                    dir(${context.WORKSPACE} + '/CerealAPI') {
+                    dir("${context.WORKSPACE}/CerealAPI") {
 
                         // Check the docker-compose version
 
