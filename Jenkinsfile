@@ -28,7 +28,7 @@
 
                         // Bring up the services
 
-                        powershell 'docker-compose  -f "docker-compose.yml" -f "docker-compose.override.yml" -f "docker-compose.overideextra.yml" --ansi never up -d'
+                        powershell 'docker-compose  -f "docker-compose.jenkins.yml" --ansi never up -d'
 
                         // Ensure the services are running
 
