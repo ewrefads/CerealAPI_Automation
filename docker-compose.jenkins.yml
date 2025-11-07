@@ -22,8 +22,8 @@ services:
        db:
         condition: service_healthy
     volumes:
-        - .\CerealAPITest:/app:rw
-        - .\CerealAPI:/src:rw
+        - ./CerealAPITest:/app:rw
+        - ./CerealAPI:/src:rw
     tty: true
   cerealapi:
     image: ${DOCKER_REGISTRY-}cerealapi
