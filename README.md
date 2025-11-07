@@ -60,22 +60,20 @@ To communicate with the database it uses the CerealContext class. It has the fol
 * Nunit3TestAdapter
 * Pomelo.EntityFrameworkCore.MySql
 * Swashbuckle.AspNetCore
-* For testing the program should be run through visual studio(2022 was used in the development)
-
+* Docker
+* Docker Compose
+* Docker Desktop(Optional)
 ### Installing
 
-* If testing download the source code from the latest release. Otherwise download the compiled version.
+* Download the source code
 * Extract the downloaded zip
 
 ### Executing program
-For testing do the following
-* If testing double click on the solution file to open in visual studio.
-* Then ensure CerealAPI is selected at the top and that it runs as https.
-* Click the https text to run it.
-* A swagger window should open in which the various API calls can be triggered.
-
-For general use
-* Start the CerealAPI.exe file
+Run the following docker command: 
+```
+docker-compose  -f "docker-compose.yml" -f "docker-compose.override.yml" -f "docker-compose.overideextra.yml" --ansi never up -d
+```
+Or start it through visual studio
 
 ## Version History
 
@@ -83,3 +81,5 @@ For general use
     * Initial Release
 * 1.1
    * Moved functionallity of Server Configuration to API and removed server configuration 
+* 1.2
+   * Reconfigured program to use docker
