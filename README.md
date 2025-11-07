@@ -81,3 +81,5 @@ Or start it through visual studio
     * Initial Release
 * 1.1
    * Moved functionallity of Server Configuration to API and removed server configuration 
+* 1.2
+   * Reconfigured program to use docker
